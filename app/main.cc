@@ -22,3 +22,23 @@
 // SOFTWARE.
 // =============================================================================
 
+// File: main.cc
+
+#include <relay/relay_top.h>
+
+#include <fstream>
+#include <ilang/util/log.h>
+
+using namespace ilang;
+
+int main() {
+  // get the ILA model
+  auto relay = GetRelayIla("relay");
+
+  ILA_INFO << "Model: " << relay;
+  ILA_INFO << "#instr: " << relay.instr_num();
+  ILA_INFO << "#input: " << relay.input_num();
+  ILA_INFO << "#state: " << relay.state_num();
+
+  return 0;
+}

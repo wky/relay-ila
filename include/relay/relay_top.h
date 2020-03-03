@@ -22,3 +22,18 @@
 // SOFTWARE.
 // =============================================================================
 
+// File: relay_top.h
+
+#ifndef RELAY_TOP_H__
+#define RELAY_TOP_H__
+
+#include <ilang/ilang++.h>
+#include <string>
+
+namespace ilang {
+
+Ila GetRelayIla(const std::string& model_name = "relay");
+
+};
+
+#endif // RELAY_TOP_H__

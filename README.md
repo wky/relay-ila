@@ -1,10 +1,4 @@
-# ILA project template
+# Relay ILA
 
-To initialize the project with your customized name, run:
+The ILA model of TVM/Relay.
 
-```bash
-python3 script/init.py <project_name>
-```
-
-This will generate the template ILA project. 
-The directory `template` can be removed afterward.

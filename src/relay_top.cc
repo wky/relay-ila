@@ -22,3 +22,20 @@
 // SOFTWARE.
 // =============================================================================
 
+// File: relay_top.cc
+
+#include <relay/relay_top.h>
+
+#include <ilang/util/log.h>
+
+namespace ilang {
+
+Ila GetRelayIla(const std::string& model_name) {
+  auto m = Ila(model_name);
+
+  // TODO
+  
+  return m;
+}
+
+}; // namespace ilang
