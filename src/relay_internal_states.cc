@@ -22,31 +22,31 @@
 // SOFTWARE.
 // =============================================================================
 
-// File: relay_top_config.h
+// File: relay_internal_states.cc
 
-#ifndef RELAY_TOP_CONFIG_H__
-#define RELAY_TOP_CONFIG_H__
+// this file include the internal states of the relay model.
+
+#include <relay/relay_top.h>
+#include <ilang/util/log.h>
 
 namespace ilang {
 
-// define top level input bitwidth
-#define RELAY_FUNC_ADDR_IN_BITWIDTH 32
-#define RELAY_FUNC_ARG_IN_BITWIDTH 8
-#define RELAY_FUNC_DATA_IN_BITWIDTH 8
+void DefineInternalState(Ila& m) {
+  // internal states for relay maxpooling 2d function
 
-// define function call run flag
-#define RELAY_FUNC_RUN_IN "relay_func_fun_in"
-#define RELAY_FUNC_RUN_IN_BITWIDTH 1
-#define RELAY_FUNC_RUN_ON 1
-#define RELAY_FUNC_RUN_OFF 0
+  // flag states for loop instructions
+  m.NewBvState(MAXPOOLING_START_FLAG, MAXPOOLING_START_FLAG_BITWIDTH);
+  m.NewBvState(MAXPOOLING_X_LOOP_FLAG, MAXPOOLING_X_LOOP_FLAG_BITWIDTH);
+  m.NewBvState(MAXPOOLING_Y_LOOP_FLAG, MAXPOOLING_Y_LOOP_FLAG_BITWIDTH);
+  m.NewBvState(MAXPOOLING_FIND_MAX_FLAG, MAXPOOLING_FIND_MAX_FLAG_BITWIDTH);
 
-// define the function call ID to represent the functions in Relay/TVM
-#define RELAY_FUNC_ID_IN "relay_func_id"
-#define RELAY_FUNC_ID_IN_BITWIDTH 8
+  // cntr states for loop instructions
+  m.NewBvState(MAXPOOLING_X_LOOP_CNTR, MAXPOOLING_X_LOOP_CNTR_BITWIDTH);
+  m.NewBvState(MAXPOOLING_Y_LOOP_CNTR, MAXPOOLING_Y_LOOP_CNTR_BITWIDTH);
 
-// define the tensor memory here
-#define RELAY_TENSOR_MEM "relay_tensor_mem"
-
+  m.NewBvState(MAXPOOLING_DATA_OUT_HEIGHT, MAXPOOLING_DATA_OUT_HEIGHT_BITWIDTH);
+  m.NewBvState(MAXPOOLING_DATA_OUT_WIDTH, MAXPOOLING_DATA_OUT_WIDTH_BITWIDTH);
+  
 }
 
-#endif // RELAY_TOP_CONFIG_H__
+} // namespace ilang

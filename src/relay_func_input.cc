@@ -22,31 +22,35 @@
 // SOFTWARE.
 // =============================================================================
 
-// File: relay_top_config.h
+// File: relay_func_input.cc
 
-#ifndef RELAY_TOP_CONFIG_H__
-#define RELAY_TOP_CONFIG_H__
+#include <relay/relay_top.h>
+
+#include <ilang/util/log.h>
 
 namespace ilang {
 
-// define top level input bitwidth
-#define RELAY_FUNC_ADDR_IN_BITWIDTH 32
-#define RELAY_FUNC_ARG_IN_BITWIDTH 8
-#define RELAY_FUNC_DATA_IN_BITWIDTH 8
-
-// define function call run flag
-#define RELAY_FUNC_RUN_IN "relay_func_fun_in"
-#define RELAY_FUNC_RUN_IN_BITWIDTH 1
-#define RELAY_FUNC_RUN_ON 1
-#define RELAY_FUNC_RUN_OFF 0
-
-// define the function call ID to represent the functions in Relay/TVM
-#define RELAY_FUNC_ID_IN "relay_func_id"
-#define RELAY_FUNC_ID_IN_BITWIDTH 8
-
-// define the tensor memory here
-#define RELAY_TENSOR_MEM "relay_tensor_mem"
-
+void DefineFuncInput(Ila& m) {
+  // input of matrix data
+  m.NewBvInput(DATA_IN_BATCH, DATA_IN_BATCH_BITWIDTH);
+  m.NewBvInput(DATA_IN_CHANNEL, DATA_IN_CHANNEL_BITWIDTH);
+  m.NewBvInput(DATA_IN_Y, DATA_IN_Y_BITWIDTH);
+  m.NewBvInput(DATA_IN_X, DATA_IN_X_BITWIDTH);
+  
+  // input of the pool_size
+  m.NewBvInput(POOL_SIZE_Y_IN, POOL_SIZE_Y_IN_BITWIDTH);
+  m.NewBvInput(POOL_SIZE_X_IN, POOL_SIZE_X_IN_BITWIDTH);
+  // input of strides
+  m.NewBvInput(STRIDES_Y_IN, STRIDES_Y_IN_BITWIDTH);
+  m.NewBvInput(STRIDES_X_IN, STRIDES_X_IN_BITWIDTH);
+  // input of padding 
+  m.NewBvInput(PADDING_IN_Y, PADDING_IN_Y_BITWIDTH);
+  m.NewBvInput(PADDING_IN_X, PADDING_IN_X_BITWIDTH);
+  // input of layout
+  m.NewBvInput(LAYOUT_IN, LAYOUT_IN_BITWIDTH);
+  // input of ceiling mode
+  m.NewBvInput(CEIL_MODE_IN, CEIL_MODE_IN_BITWIDTH);
+  
 }
 
-#endif // RELAY_TOP_CONFIG_H__
+} // namespace ilang

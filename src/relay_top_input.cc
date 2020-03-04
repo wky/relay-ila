@@ -22,31 +22,19 @@
 // SOFTWARE.
 // =============================================================================
 
-// File: relay_top_config.h
+// File: relay_top_input.cc
 
-#ifndef RELAY_TOP_CONFIG_H__
-#define RELAY_TOP_CONFIG_H__
+#include <relay/relay_top.h>
+
+#include <ilang/util/log.h>
 
 namespace ilang {
 
-// define top level input bitwidth
-#define RELAY_FUNC_ADDR_IN_BITWIDTH 32
-#define RELAY_FUNC_ARG_IN_BITWIDTH 8
-#define RELAY_FUNC_DATA_IN_BITWIDTH 8
-
-// define function call run flag
-#define RELAY_FUNC_RUN_IN "relay_func_fun_in"
-#define RELAY_FUNC_RUN_IN_BITWIDTH 1
-#define RELAY_FUNC_RUN_ON 1
-#define RELAY_FUNC_RUN_OFF 0
-
-// define the function call ID to represent the functions in Relay/TVM
-#define RELAY_FUNC_ID_IN "relay_func_id"
-#define RELAY_FUNC_ID_IN_BITWIDTH 8
-
-// define the tensor memory here
-#define RELAY_TENSOR_MEM "relay_tensor_mem"
-
+void DefineTopInput(Ila& m) {
+  // define top function run input
+  m.NewBvInput(RELAY_FUNC_RUN_IN, RELAY_FUNC_RUN_IN_BITWIDTH);
+  // define top function call id input
+  m.NewBvInput(RELAY_FUNC_ID_IN, RELAY_FUNC_ID_IN_BITWIDTH);
 }
 
-#endif // RELAY_TOP_CONFIG_H__
+} // namespace ilang
