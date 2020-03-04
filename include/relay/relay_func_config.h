@@ -22,22 +22,13 @@
 // SOFTWARE.
 // =============================================================================
 
-// File: relay_top.h
+// File: relay_func_config.h
 
-#ifndef RELAY_TOP_H__
-#define RELAY_TOP_H__
+#ifndef RELAY_FUNC_CONFIG_H__
+#define RELAY_FUNC_CONFIG_H__
 
-#include <ilang/ilang++.h>
-#include <relay/relay_func_config.h>
-#include <relay/relay_top_config.h>
-#include <string>
+#include <relay/relay_func_call.h>
+#include <relay/relay_maxpooling.h>
 
-namespace ilang {
 
-Ila GetRelayIla(const std::string& model_name = "relay");
-
-void Maxpooling2D(Ila& m);
-
-};
-
-#endif // RELAY_TOP_H__
+#endif // RELAY_FUNC_CONFIG_H__

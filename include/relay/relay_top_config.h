@@ -22,22 +22,27 @@
 // SOFTWARE.
 // =============================================================================
 
-// File: relay_top.h
+// File: relay_top_config.h
 
-#ifndef RELAY_TOP_H__
-#define RELAY_TOP_H__
-
-#include <ilang/ilang++.h>
-#include <relay/relay_func_config.h>
-#include <relay/relay_top_config.h>
-#include <string>
+#ifndef RELAY_TOP_CONFIG_H__
+#define RELAY_TOP_CONFIG_H__
 
 namespace ilang {
 
-Ila GetRelayIla(const std::string& model_name = "relay");
+// define top level input bitwidth
+#define RELAY_FUNC_ADDR_IN_BITWIDTH 32
+#define RELAY_FUNC_ARG_IN_BITWIDTH 8
 
-void Maxpooling2D(Ila& m);
+// define function call run flag
+#define RELAY_FUNC_RUN_IN "relay_func_fun_in"
+#define RELAY_FUNC_RUN_IN_BITWIDHT 1
+#define RELAY_FUNC_RUN_ON 1
+#define RELAY_FUNC_RUN_OFF 0
 
-};
+// define the function call ID to represent the functions in Relay/TVM
+#define RELAY_FUNC_ID_IN "relay_func_id"
+#define RELAY_FUNC_ID_IN_BITWIDTH 8
 
-#endif // RELAY_TOP_H__
+}
+
+#endif // RELAY_TOP_CONFIG_H__

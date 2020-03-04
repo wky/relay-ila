@@ -22,22 +22,44 @@
 // SOFTWARE.
 // =============================================================================
 
-// File: relay_top.h
+// File: relay_maxpooling.h
 
-#ifndef RELAY_TOP_H__
-#define RELAY_TOP_H__
-
-#include <ilang/ilang++.h>
-#include <relay/relay_func_config.h>
-#include <relay/relay_top_config.h>
-#include <string>
+#ifndef RELAY_MAXPOOLING_H__
+#define RELAY_MAXPOOLING_H__
 
 namespace ilang {
 
-Ila GetRelayIla(const std::string& model_name = "relay");
+// set maxpooling function arguments as ILA input for now
+// define function input names
+#define DATA_ADDR_IN "data_addr_in"
+#define DATA_ADDR_IN_BITWIDTH   RELAY_FUNC_ADDR_IN_BITWIDTH
 
-void Maxpooling2D(Ila& m);
+// define input pool_size(y, x)
+#define POOL_SIZE_Y_IN "pool_size_y"
+#define POOL_SIZE_Y_IN_BITWIDTH RELAY_FUNC_ARG_IN_BITWIDTH
 
-};
+#define POOL_SIZE_X_IN "pool_size_x"
+#define POOL_SIZE_X_IN_BITWIDTH RELAY_FUNC_ARG_IN_BITWIDTH
 
-#endif // RELAY_TOP_H__
+// define input strides(y, x)
+#define STRIDES_Y_IN "strides_y_in"
+#define STRIDES_Y_IN_BITWIDTH RELAY_FUNC_ARG_IN_BITWIDTH
+
+#define STRIDES_X_IN "strides_x_in"
+#define STRIDES_Y_IN_BITWIDTH RELAY_FUNC_ARG_IN_BITWIDTH
+
+// define input padding(y, x)
+#define PADDING_IN_Y "padding_in_y"
+#define PADDING_IN_Y_BITWIDTH RELAY_FUNC_ARG_IN_BITWIDTH
+
+#define PADDING_IN_X "padding_in_x"
+#define PADDING_IN_X_BITWIDTH RELAY_FUNC_ARG_IN_BITWIDTH
+
+// define input layout 
+#define 
+
+// define input pool
+}
+
+
+#endif // RELAY_MAXPOOLING_H__
