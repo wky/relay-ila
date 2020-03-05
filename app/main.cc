@@ -29,11 +29,15 @@
 #include <fstream>
 #include <ilang/util/log.h>
 
+#include <iostream>
+#include <ilang/ila/instr_lvl_abs.h>
+#include <ilang/target-sc/ila_sim.h>
+
 using namespace ilang;
 
 int main() {
   // get the ILA model
-  auto relay = GetRelayIla("relay");
+  auto relay = GetRelayIla("relay_sim");
 
   ILA_INFO << "Model: " << relay;
   ILA_INFO << "#instr: " << relay.instr_num();
@@ -46,6 +50,20 @@ int main() {
     ILA_INFO << "#input: " << relay.child(i).input_num();
     ILA_INFO << "#state: " << relay.child(i).state_num();
   }
+
+  auto model = relay.get();
+  ILA_INFO << "before calling sim gen function";
+  // simulation generation
+  IlaSim simulator_generator;
+  std::string sim_gen_dir = "./sim_model/";
+  std::string systemc_path = "/u/yl29/local";
+  bool cpp_gen = false;
+  // ILA_INFO << "test";
+  simulator_generator.set_instr_lvl_abs(model);
+  simulator_generator.set_systemc_path(systemc_path);
+  // ILA_INFO << "before debug";
+  //simulator_generator.sim_gen_decode_d();
+  simulator_generator.sim_gen(sim_gen_dir, false, true, cpp_gen);
 
   return 0;
 }
