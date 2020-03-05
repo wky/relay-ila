@@ -73,6 +73,8 @@ SC_MODULE(Source) {
     const char *addr_x_c, *addr_y_c;
     const char *data_byte_c;
 
+    sc_biguint<32> relay_sim_data_in_x_base;
+
     wait(10, SC_NS);
 
     fin.open("/u/yl29/3LA/test_input_relay.csv", ios::in);
@@ -106,7 +108,7 @@ SC_MODULE(Source) {
         addr_x = data_in_x.substr(data_in_x.length() - 5, 5);
         addr_x_format = "0x00" + addr_x;
         addr_x_c = addr_x_format.c_str();
-        relay_sim_data_in_x_in = addr_x_c;
+        relay_sim_data_in_x_base = addr_x_c;
 
         // extract the data
         data_format.clear();
@@ -123,7 +125,7 @@ SC_MODULE(Source) {
           data_byte_c = ("0x" + data_byte).c_str();
 
           relay_sim_relay_data_in_in = data_byte_c;
-          relay_sim_data_in_x_in = relay_sim_data_in_x_in + 1;
+          relay_sim_data_in_x_in = relay_sim_data_in_x_base + i;
 
           std::cout << "@" << sc_time_stamp() << '\t';
           std::cout << "addr: " << hex << relay_sim_data_in_x_in << '\t';
@@ -243,14 +245,14 @@ SC_MODULE(testbench) {
     
     wait(10, SC_NS);
     std::cout << "@" << sc_time_stamp() << " ********* simulation start *********" << std::endl;
-    wait(10, SC_NS);
+    // wait(10, SC_NS);
 
-    if (relay_sim_relay_func_run_in_signal == 0) {
-      wait(1000, SC_NS);
-    }
+    // if (relay_sim_relay_func_run_in_signal == 0) {
+    //   wait(1000, SC_NS);
+    // }
 
-    std::cout << "@" << sc_time_stamp() << " *********     sc_stop      *********" << std::endl;
-    sc_stop();
+    // std::cout << "@" << sc_time_stamp() << " *********     sc_stop      *********" << std::endl;
+    // sc_stop();
   }
 };
 
