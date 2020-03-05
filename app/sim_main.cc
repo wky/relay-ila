@@ -55,14 +55,12 @@ SC_MODULE(Source) {
     wait(10, SC_NS);
 
     std::ifstream fin;
-    std::string mode, addr, data;
-    std::string data_format;
     std::string temp;
     std::string hex_hdr = "0x";
-    std::string addr_format;
 
     std::string addr_x, addr_y;
     std::string addr_x_format, addr_y_format;
+    std::string data_format;
 
     // relay input temp
     std::string func_run, func_id;
@@ -107,7 +105,7 @@ SC_MODULE(Source) {
         // extract the address
         addr_x = data_in_x.substr(data_in_x.length() - 5, 5);
         addr_x_format = "0x00" + addr_x;
-        addr_x_c = addr_format.c_str();
+        addr_x_c = addr_x_format.c_str();
         relay_sim_data_in_x_in = addr_x_c;
 
         // extract the data
@@ -126,7 +124,7 @@ SC_MODULE(Source) {
 
           relay_sim_relay_data_in_in = data_byte_c;
           relay_sim_data_in_x_in = relay_sim_data_in_x_in + i;
-          
+
           std::cout << "@" << sc_time_stamp() << '\t';
           std::cout << "addr: " << hex << relay_sim_data_in_x_in << '\t';
           std::cout << "data: " << hex << relay_sim_relay_data_in_in << std::endl;
@@ -141,11 +139,11 @@ SC_MODULE(Source) {
         // extract the address
         addr_x = data_in_x.substr(data_in_x.length() - 5, 5);
         addr_x_format = "0x00" + addr_x;
-        addr_x_c = addr_format.c_str();
+        addr_x_c = addr_x_format.c_str();
 
         addr_y = data_in_y.substr(data_in_y.length() - 5, 5);
         addr_y_format = "0x00" + addr_y;
-        addr_y_c = addr_format.c_str();
+        addr_y_c = addr_y_format.c_str();
 
         // pass the data to the port
         relay_sim_relay_data_in_in = 0;
