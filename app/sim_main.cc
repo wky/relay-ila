@@ -123,7 +123,7 @@ SC_MODULE(Source) {
           data_byte_c = ("0x" + data_byte).c_str();
 
           relay_sim_relay_data_in_in = data_byte_c;
-          relay_sim_data_in_x_in = relay_sim_data_in_x_in + i;
+          relay_sim_data_in_x_in = relay_sim_data_in_x_in + 1;
 
           std::cout << "@" << sc_time_stamp() << '\t';
           std::cout << "addr: " << hex << relay_sim_data_in_x_in << '\t';
