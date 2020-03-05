@@ -85,14 +85,32 @@ namespace ilang {
 #define MAXPOOLING_START_FLAG "maxpooling_start_flag"
 #define MAXPOOLING_START_FLAG_BITWIDTH FLAG_BITWIDTH
 
-#define MAXPOOLING_X_LOOP_FLAG "maxpooling_X_loop_flag"
-#define MAXPOOLING_X_LOOP_FLAG_BITWIDTH FLAG_BITWIDTH
+// #define MAXPOOLING_X_END_LOOP_FLAG "maxpooling_X_end_loop_flag"
+// #define MAXPOOLING_X_END_LOOP_FLAG_BITWIDTH FLAG_BITWIDTH
 
-#define MAXPOOLING_Y_LOOP_FLAG "maxpooling_Y_loop_flag"
-#define MAXPOOLING_Y_LOOP_FLAG_BITWIDTH FLAG_BITWIDTH
+// #define MAXPOOLING_Y_END_LOOP_FLAG "maxpooling_Y_end_loop_flag"
+// #define MAXPOOLING_Y_END_LOOP_FLAG_BITWIDTH FLAG_BITWIDTH
 
-#define MAXPOOLING_FIND_MAX_FLAG "maxpooling_find_max_flag"
-#define MAXPOOLING_FIND_MAX_FLAG_BITWIDTH FLAG_BITWIDTH
+// #define MAXPOOLING_FIND_MAX_FLAG "maxpooling_find_max_flag"
+// #define MAXPOOLING_FIND_MAX_FLAG_BITWIDTH FLAG_BITWIDTH
+
+// #define MAXPOOLING_MAX_FOUND_FLAG "maxpooling_max_found_flag"
+// #define MAXPOOLING_MAX_FOUND_FLAG_BITWIDTH FLAG_BITWIDTH
+
+// #define MAXPOOLING_VAR_UPDATE_FLAG "maxpooling_var_update_flag"
+// #define MAXPOOLING_VAR_UPDATE_FLAG_BITWIDTH FLAG_BITWIDTH
+
+#define MAXPOOLING_STATE "maxpooling_state"
+#define MAXPOOLING_STATE_BITWIDTH 3
+
+#define MAXPOOLING_STATE_INC_X 0
+#define MAXPOOLING_STATE_INC_Y 1
+#define MAXPOOLING_STATE_FIND_MAX 2
+#define MAXPOOLING_STATE_FIND_MAX_CHILD 3
+#define MAXPOOLING_STATE_WRITE 4
+#define MAXPOOLING_STATE_VAR_UPDATE 5
+#define MAXPOOLING_STATE_DONE 6
+
 
 // counter
 #define MAXPOOLING_X_LOOP_CNTR "maxpooling_X_loop_cntr"
@@ -108,12 +126,15 @@ namespace ilang {
 #define MAXPOOLING_DATA_OUT_WIDTH_BITWIDTH RELAY_FUNC_ADDR_IN_BITWIDTH
 
 // child states for find max
+// find_max_cntr bitwidth should be twice larger than arg width
 #define MAXPOOLING_FIND_MAX_CNTR "maxpooling_find_max_cntr"
-#define MAXPOOLING_FIND_MAX_CNTR_BITWIDTH RELAY_FUNC_ARG_IN_BITWIDTH
+#define MAXPOOLING_FIND_MAX_CNTR_BITWIDTH 2*RELAY_FUNC_ARG_IN_BITWIDTH
 
 #define MAXPOOLING_FIND_MAX_RESULT "maxpooling_find_max_result"
 #define MAXPOOLING_FIND_MAX_RESULT_BITWIDTH RELAY_FUNC_DATA_IN_BITWIDTH
 
+#define MAXPOOLING_FIND_MAX_CHILD_FLAG "maxpooling_find_max_child_flag"
+#define MAXPOOLING_FIND_MAX_CHILD_FLAG_BITWIDTH FLAG_BITWIDTH
 
 
 }

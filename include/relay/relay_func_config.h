@@ -27,6 +27,7 @@
 #ifndef RELAY_FUNC_CONFIG_H__
 #define RELAY_FUNC_CONFIG_H__
 
+
 #include <relay/relay_func_call.h>
 #include <relay/relay_maxpooling.h>
 

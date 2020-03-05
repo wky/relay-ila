@@ -53,6 +53,13 @@ find_package(ilang REQUIRED)
 add_executable(${MyTarget} 
   app/main.cc
   src/relay_top.cc
+  src/relay_top_input.cc
+  src/relay_func_input.cc
+  src/relay_arch_states.cc
+  src/relay_internal_states.cc
+  src/relay_maxpooling_2d.cc
+
+
 )
 
 target_include_directories(${MyTarget} PRIVATE include)

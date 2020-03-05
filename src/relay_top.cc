@@ -34,6 +34,24 @@ Ila GetRelayIla(const std::string& model_name) {
   auto m = Ila(model_name);
 
   // TODO
+  // define top input
+  DefineTopInput(m);
+
+  // define function input
+  DefineFuncInput(m);
+
+  // define architectural states
+  DefineArchState(m);
+
+  // define internal states
+  DefineInternalState(m);
+
+  auto is_func_call = (m.input(RELAY_FUNC_RUN_IN) == RELAY_FUNC_RUN_ON);
+  auto is_valid_func = (m.input(RELAY_FUNC_ID_IN) > 0);
+  m.SetValid(is_func_call & is_valid_func);
+
+  // define Relay instructions
+  DefineMaxpooling2D(m);
   
   return m;
 }
