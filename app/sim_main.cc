@@ -245,8 +245,10 @@ SC_MODULE(testbench) {
     std::cout << "@" << sc_time_stamp() << " ********* simulation start *********" << std::endl;
     wait(10, SC_NS);
 
+    if (relay_sim_relay_func_run_in_signal == 0) {
+      wait(1000, SC_NS);
+    }
 
-    wait(1000, SC_NS);
     std::cout << "@" << sc_time_stamp() << " *********     sc_stop      *********" << std::endl;
     sc_stop();
   }
