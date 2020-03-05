@@ -77,14 +77,14 @@ SC_MODULE(Source) {
 
     wait(10, SC_NS);
 
-    fin.open("/u/yl29/3LA/test_input.csv", ios::in);
+    fin.open("/u/yl29/3LA/test_input_relay.csv", ios::in);
 
     while(std::getline(fin, temp, ',')) {
       std::getline(fin, func_run, ',');
       std::getline(fin, func_id, ',');
 
       if (func_id.compare("1") == 0) { // function maxpooling
-        std::getline(fin, data_in, ',');
+        // std::getline(fin, data_in, ',');
         std::getline(fin, data_in_y, ',');
         std::getline(fin, data_in_x, ',');
         std::getline(fin, pool_y, ',');
@@ -94,8 +94,8 @@ SC_MODULE(Source) {
 
 
       } else { // function tensor store
-        std::getline(fin, data_in, ',');
-        std::getline(fin, data_in_x, '\n');
+        std::getline(fin, data_in_x, ',');
+        std::getline(fin, data_in_y, '\n');
       }
 
       relay_sim_relay_func_run_in_in = func_run.c_str();
@@ -112,11 +112,11 @@ SC_MODULE(Source) {
 
         // extract the data
         data_format.clear();
-        if (data.length() <= 34) {
-          data_format.append(34 - data.length(), '0');
-          data_format.append(data.substr(2));
+        if (data_in_y.length() <= 34) {
+          data_format.append(34 - data_in_y.length(), '0');
+          data_format.append(data_in_y.substr(2));
         } else {
-          data_format.append(data.substr(data.length()-32));
+          data_format.append(data_in_y.substr(data_in_y.length()-32));
         }
         // TODO: modify here
         std::string data_byte;
@@ -126,6 +126,11 @@ SC_MODULE(Source) {
 
           relay_sim_relay_data_in_in = data_byte_c;
           relay_sim_data_in_x_in = relay_sim_data_in_x_in + i;
+          
+          std::cout << "@" << sc_time_stamp() << '\t';
+          std::cout << "addr: " << hex << relay_sim_data_in_x_in << '\t';
+          std::cout << "data: " << hex << relay_sim_relay_data_in_in << std::endl;
+
           wait(1, SC_NS);
         }
       }
@@ -151,7 +156,7 @@ SC_MODULE(Source) {
         relay_sim_strides_y_in_in = stride_y.c_str();
         relay_sim_strides_x_in_in = stride_x.c_str();
 
-        std::cout << "relay maxpooling instr passed!" << std::endl;
+        std::cout << "@" << sc_time_stamp() << '\t' << "relay maxpooling instr passed!" << std::endl;
       }
 
 
