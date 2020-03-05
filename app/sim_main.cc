@@ -238,43 +238,44 @@ SC_MODULE(testbench) {
 
   void run() {
     int i = 0;
-    bool undone = true;
-    int stop_addr = 0xdead;
+    bool done = false;
+
     std::ofstream fout;
     fout.open("./test_output_relay.txt", ofstream::out | ofstream::trunc);
     
     wait(10, SC_NS);
     std::cout << "@" << sc_time_stamp() << " ********* simulation start *********" << std::endl;
 
-    while(undone) {
-      if (relay.relay_sim_relay_func_run_in.to_int() == 0) {
-        undone = false;
+    if (relay.relay_sim_relay_func_id.to_int() == 3) {
+      done = true;
+    }
+
+    if (done) {
+      wait(100);
+      fout << "********* output for tensor memory ***********" << endl;
+      
+      int entry_addr;
+      int index;
+      int tensor_out_y = relay.relay_sim_maxpooling_data_out_height.to_int() / 16;
+      int tensor_out_x = relay.relay_sim_maxpooling_data_out_width.to_int() / 16;
+      int entry_max_16 = tensor_out_x * tensor_out_y;
+
+      for (int j = 0; j < entry_max_16; j++) {
+          entry_addr = 16*j;
+          fout << "tensor mem @ addr:" << '\t';
+          fout << hex << entry_addr << '\t';
+          fout << "data:" << '\t';
+          for (int k = 0; k < 16; k++) {
+              index = 16*j + 15 - k;
+              fout << hex << relay.decode_relay_sim_func_tensor_store_update_relay_sim_relay_tensor_mem_map[index] << ' ';
+          }
+          fout << endl;
       }
+
+      wait(1000);
+      sc_stop();
     }
 
-    wait(100);
-    fout << "********* output for tensor memory ***********" << endl;
-    
-    int entry_addr;
-    int index;
-    int tensor_out_y = relay.relay_sim_maxpooling_data_out_height.to_int() / 16;
-    int tensor_out_x = relay.relay_sim_maxpooling_data_out_width.to_int() / 16;
-    int entry_max_16 = tensor_out_x * tensor_out_y;
-
-    for (int j = 0; j < entry_max_16; j++) {
-        entry_addr = 16*j;
-        fout << "tensor mem @ addr:" << '\t';
-        fout << hex << entry_addr << '\t';
-        fout << "data:" << '\t';
-        for (int k = 0; k < 16; k++) {
-            index = 16*j + 15 - k;
-            fout << hex << relay.decode_relay_sim_func_tensor_store_update_relay_sim_relay_tensor_mem_map[index] << ' ';
-        }
-        fout << endl;
-    }
-
-    wait(1000);
-    sc_stop();
   }
 };
 
