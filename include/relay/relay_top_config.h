@@ -36,7 +36,7 @@ namespace ilang {
 #define RELAY_FUNC_ID_IN_BITWIDTH 8
 
 // define relay top function call run flag
-#define RELAY_FUNC_RUN_IN "relay_func_fun_in"
+#define RELAY_FUNC_RUN_IN "relay_func_run_in"
 #define RELAY_FUNC_RUN_IN_BITWIDTH 1
 #define RELAY_FUNC_RUN_ON 1
 #define RELAY_FUNC_RUN_OFF 0
