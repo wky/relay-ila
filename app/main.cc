@@ -40,5 +40,12 @@ int main() {
   ILA_INFO << "#input: " << relay.input_num();
   ILA_INFO << "#state: " << relay.state_num();
 
+  for (auto i = 0; i < relay.child_num(); i++) {
+    ILA_INFO << "Model: " << relay.child(i);
+    ILA_INFO << "#instr: " << relay.child(i).instr_num();
+    ILA_INFO << "#input: " << relay.child(i).input_num();
+    ILA_INFO << "#state: " << relay.child(i).state_num();
+  }
+
   return 0;
 }
