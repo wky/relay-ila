@@ -31,12 +31,14 @@
 namespace ilang {
 
 void DefineFuncInput(Ila& m) {
+
+  /******** input of function maxpooling **********/
   // input of matrix data
   m.NewBvInput(DATA_IN_BATCH, DATA_IN_BATCH_BITWIDTH);
   m.NewBvInput(DATA_IN_CHANNEL, DATA_IN_CHANNEL_BITWIDTH);
   m.NewBvInput(DATA_IN_Y, DATA_IN_Y_BITWIDTH);
   m.NewBvInput(DATA_IN_X, DATA_IN_X_BITWIDTH);
-  
+
   // input of the pool_size
   m.NewBvInput(POOL_SIZE_Y_IN, POOL_SIZE_Y_IN_BITWIDTH);
   m.NewBvInput(POOL_SIZE_X_IN, POOL_SIZE_X_IN_BITWIDTH);

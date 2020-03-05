@@ -49,6 +49,7 @@ void DefineArchState(Ila& m);
 void DefineInternalState(Ila& m);
 
 // define Relay instructions
+void DefineTensorStore(Ila& m);
 void DefineMaxpooling2D(Ila& m);
 
 

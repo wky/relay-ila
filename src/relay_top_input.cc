@@ -35,6 +35,8 @@ void DefineTopInput(Ila& m) {
   m.NewBvInput(RELAY_FUNC_RUN_IN, RELAY_FUNC_RUN_IN_BITWIDTH);
   // define top function call id input
   m.NewBvInput(RELAY_FUNC_ID_IN, RELAY_FUNC_ID_IN_BITWIDTH);
+  // define top data input here
+  m.NewBvInput(RELAY_DATA_IN, RELAY_DATA_IN_BITWIDTH);
 }
 
 } // namespace ilang

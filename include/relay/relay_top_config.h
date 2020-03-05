@@ -33,12 +33,17 @@ namespace ilang {
 #define RELAY_FUNC_ADDR_IN_BITWIDTH 32
 #define RELAY_FUNC_ARG_IN_BITWIDTH 8
 #define RELAY_FUNC_DATA_IN_BITWIDTH 8
+#define RELAY_FUNC_ID_IN_BITWIDTH 8
 
-// define function call run flag
+// define relay top function call run flag
 #define RELAY_FUNC_RUN_IN "relay_func_fun_in"
 #define RELAY_FUNC_RUN_IN_BITWIDTH 1
 #define RELAY_FUNC_RUN_ON 1
 #define RELAY_FUNC_RUN_OFF 0
+
+// define relay top level data in
+#define RELAY_DATA_IN "relay_data_in"
+#define RELAY_DATA_IN_BITWIDTH 8
 
 // define the function call ID to represent the functions in Relay/TVM
 #define RELAY_FUNC_ID_IN "relay_func_id"

@@ -51,6 +51,7 @@ Ila GetRelayIla(const std::string& model_name) {
   m.SetValid(is_func_call & is_valid_func);
 
   // define Relay instructions
+  DefineTensorStore(m);
   DefineMaxpooling2D(m);
   
   return m;
