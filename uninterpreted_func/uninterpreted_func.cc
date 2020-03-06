@@ -1,7 +1,7 @@
 #include "systemc.h"
-#include "flex_sim.h"
+#include "relay_sim.h"
 
-sc_biguint<8> flex_sim::signed_gt(sc_biguint<8> arg_0, sc_biguint<8> arg_1) {
+sc_biguint<8> relay_sim::signed_gt(sc_biguint<8> arg_0, sc_biguint<8> arg_1) {
   int arg_0_int = arg_0.to_int();
   int arg_1_int = arg_1.to_int();
 
