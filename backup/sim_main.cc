@@ -298,7 +298,7 @@ SC_MODULE(testbench) {
           for (int k = 0; k < 16; k++) {
               index = 16*j + 15 - k;
               //cout << "index of the matrix: " << index << endl;
-              fout << hex << relay.decode_relay_sim_func_tensor_store_update_relay_sim_relay_tensor_mem_map[index] << ' ';
+              fout << hex << relay.relay_sim_relay_tensor_mem[index] << ' ';
           }
           fout << endl;
       }
