@@ -246,12 +246,18 @@ SC_MODULE(testbench) {
     wait(10, SC_NS);
     std::cout << "@" << sc_time_stamp() << " ********* simulation start *********" << std::endl;
 
-    if (relay.relay_sim_relay_func_id.to_int() == 3) {
-      done = true;
+    while(!done) {
+      if (relay.relay_sim_relay_func_id.to_int() == 3) {
+        done = true;
+      }
+
+      //cout << "@" << sc_time_stamp() << '\t';
+      //cout << "is write: " << (relay.relay_sim_relay_func_id.to_int() == 2) << '\t';
     }
+      
 
     if (done) {
-      wait(100);
+      wait(100, SC_NS);
       fout << "********* output for tensor memory ***********" << endl;
       
       int entry_addr;
@@ -272,7 +278,7 @@ SC_MODULE(testbench) {
           fout << endl;
       }
 
-      wait(1000);
+      wait(1000, SC_NS);
       sc_stop();
     }
 
