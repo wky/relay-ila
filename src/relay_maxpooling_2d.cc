@@ -36,6 +36,11 @@ namespace ilang {
 void AddChild_Loop_Op(Ila& m);
 void AddChild_Find_Max(Ila& m);
 
+auto uf_out = SortRef::BV(RELAY_FUNC_DATA_IN_BITWIDTH);
+auto uf_in1 = SortRef::BV(RELAY_FUNC_DATA_IN_BITWIDTH);
+auto uf_in2 = SortRef::BV(RELAY_FUNC_DATA_IN_BITWIDTH);
+FuncRef signed_gt("signed_gt", uf_out, uf_in1, uf_in2);
+
 void DefineMaxpooling2D(Ila& m) {
   
   {
@@ -275,8 +280,12 @@ void DefineMaxpooling2D(Ila& m) {
       // fetch the data in the memory
       auto data = Load(tensor, addr);
       
+      // auto result_tmp = Ite(cntr_find_max == 0, data,
+      //                       Ite(data > result, data, result));
+
+      // use uninterpreted function
       auto result_tmp = Ite(cntr_find_max == 0, data,
-                            Ite(data > result, data, result));
+                              signed_gt(result, data));
       
       // state updates
       auto find_finish = (cntr_find_max == (window_size - 1));
