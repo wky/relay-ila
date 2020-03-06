@@ -34,10 +34,16 @@ int main() {
   long long int addr_offset;
 
   int group_num = num_timesteps / 16;
-  int group_size = num_timesteps * num_vectors;
+  int group_size = 16 * num_vectors;
 
   int group_index, block_index;
   int block_entry_num;
+
+  int block_size = 16;
+  int addr_flex;
+
+  int x_flex, y_flex;
+  int x_relay, y_relay;
 
   while(getline(fin, temp, ',')) {
     getline(fin, mode, ',');
@@ -52,14 +58,20 @@ int main() {
     fout << "t,";
 
     group_index = i / group_size;
-    block_index = (i % group_size) / num_vectors;
-    block_entry_num = (i % group_size) % num_vectors;
+    addr_flex = i % group_size;
+    y_flex = addr_flex / 16;
+    x_flex = addr_flex % 16;
+    
+    x_relay = y_flex;
+    y_relay = x_flex;
 
-    cout << group_index << '\t' << block_index << '\t' << block_entry_num << '\n';
-
-    addr_offset = (group_index*group_size + block_entry_num*num_vectors + block_index) * 16;
+    addr_offset = (group_index * group_size + y_relay * num_vectors + x_relay) * 16;
 
     addr_out_int = addr_min + addr_offset;
+
+    cout << dec << group_index << '\t' << x_relay << '\t' << y_relay << '\t';
+    cout << hex << addr_offset << '\t' << addr_out_int << endl;
+
 
     if (mode.compare("W") == 0) {
       fout << "1,2,";
