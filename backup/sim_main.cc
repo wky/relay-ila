@@ -178,14 +178,14 @@ SC_MODULE(Source) {
         relay_sim_strides_y_in_in = stride_y.c_str();
         relay_sim_strides_x_in_in = stride_x.c_str();
 
-        std::cout << "@" << sc_time_stamp() << '\t' << "relay maxpooling instr passed!" << std::endl;
+        //std::cout << "@" << sc_time_stamp() << '\t' << "relay maxpooling instr passed!" << std::endl;
       }
 
 
       wait(50, SC_NS);
-      std::cout << "@" << sc_time_stamp() << '\t' << "src reading" << std::endl;
-      std::cout << "@" << sc_time_stamp() << '\t' << "func run: " << func_run << '\t';
-      std::cout << "func id: " << func_id << std::endl;
+      //std::cout << "@" << sc_time_stamp() << '\t' << "src reading" << std::endl;
+      //std::cout << "@" << sc_time_stamp() << '\t' << "func run: " << func_run << '\t';
+      //std::cout << "func id: " << func_id << std::endl;
     }
 
     // cout << "source created for testbench" << endl;
@@ -272,16 +272,24 @@ SC_MODULE(testbench) {
     std::cout << "@" << sc_time_stamp() << " ********* simulation start *********" << std::endl;
 
     wait(40000, SC_NS);
-    std::cout << "@" << sc_time_stamp() << '\t' << relay.relay_sim_relay_func_id.to_int() << std::endl;
+    //std::cout << "@" << sc_time_stamp() << '\t' << relay.relay_sim_relay_func_id.to_int() << std::endl;
     if (relay.relay_sim_relay_func_id.to_int() == 3) {
-        std::cout << "are you ok?" << std::endl;
-        done = true;
-      cout << "what is ur problem?" << endl;
+     //   std::cout << "are you ok?" << std::endl;
+       done = true;
+    //  cout << "what is ur problem?" << endl;
     }
     
     if (done) {
       wait(100, SC_NS);
       fout << "********* output for tensor memory ***********" << endl;
+
+      fout << dec << "input tensor size: " << '\t';
+      fout << "height: " << relay.relay_sim_data_in_y.to_int() << '\t' << "width: " << relay.relay_sim_data_in_x.to_int() << endl;
+      fout << "pooling: " << '\t';
+      fout << "pool_y: "  << relay.relay_sim_pool_size_y.to_int() << '\t' << "pool_x: " << relay.relay_sim_pool_size_x.to_int() << endl;
+      fout << "stride: " << '\t';
+      fout << "stride_y: " << relay.relay_sim_strides_y_in.to_int() << '\t' << "stride_x: " << relay.relay_sim_strides_x_in.to_int() << endl; 
+      fout << endl;
       
       int entry_addr;
       int index;
