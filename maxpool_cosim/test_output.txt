@@ -1,0 +1,38 @@
+********* output for tensor memory ***********
+input tensor size: 	height: 16	width: 64
+pooling: 	pool_y: 2	pool_x: 1
+stride: 	stride_y: 2	stride_x: 1
+
+comparing data at addr: 0	correct!
+comparing data at addr: 10	correct!
+comparing data at addr: 20	correct!
+comparing data at addr: 30	correct!
+comparing data at addr: 40	correct!
+comparing data at addr: 50	correct!
+comparing data at addr: 60	correct!
+comparing data at addr: 70	correct!
+comparing data at addr: 80	correct!
+comparing data at addr: 90	correct!
+comparing data at addr: a0	correct!
+comparing data at addr: b0	correct!
+comparing data at addr: c0	correct!
+comparing data at addr: d0	correct!
+comparing data at addr: e0	correct!
+comparing data at addr: f0	correct!
+comparing data at addr: 100	correct!
+comparing data at addr: 110	correct!
+comparing data at addr: 120	correct!
+comparing data at addr: 130	correct!
+comparing data at addr: 140	correct!
+comparing data at addr: 150	correct!
+comparing data at addr: 160	correct!
+comparing data at addr: 170	correct!
+comparing data at addr: 180	correct!
+comparing data at addr: 190	correct!
+comparing data at addr: 1a0	correct!
+comparing data at addr: 1b0	correct!
+comparing data at addr: 1c0	correct!
+comparing data at addr: 1d0	correct!
+comparing data at addr: 1e0	correct!
+comparing data at addr: 1f0	correct!
+compared #total: 512	#correct: 512	#failed: 0
