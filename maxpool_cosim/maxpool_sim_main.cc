@@ -97,8 +97,8 @@ SC_MODULE(Source) {
 
     wait(10, SC_NS);
 
-    fin_relay.open("/u/yl29/3LA/test_input_new.csv", ios::in);
-    fin_flex.open("/u/yl29/3LA/test_input.csv", ios::in);
+    fin_relay.open("./test_input_relay.csv", ios::in);
+    fin_flex.open("./test_input_flex.csv", ios::in);
     cout << "file open relay? " << fin_relay.is_open() << endl;
     cout << "file open flex? " << fin_flex.is_open() << endl;
 
@@ -178,7 +178,7 @@ SC_MODULE(Source) {
               data_format.append(data_in_y.substr(data_in_y.length()-32));
             }
 
-            cout << "@" << sc_time_stamp() << '\t' << "data format: " << data_format << endl;
+            //cout << "@" << sc_time_stamp() << '\t' << "data format: " << data_format << endl;
             std::string data_byte;
 
             for (int i = 0; i<16; i++) {
@@ -420,7 +420,7 @@ SC_MODULE(testbench) {
         
         entry_addr_relay = 16*j;
 
-        int entry_g_offset_flex = group_size * (group_index / 2);
+        int entry_g_offset_flex = 2 * group_size * (group_index / 2);
         entry_addr_flex = 16*(entry_g_offset_flex + 16*y_flex + x_flex + (group_index % 2) * 8);
         
         fout << "comparing data at addr: " << hex << 16*j << '\t';
@@ -438,16 +438,13 @@ SC_MODULE(testbench) {
             } else {
               error += 1;
               err += 1;
-              //fout << "wrong data: " << "relay @ addr: " << index_relay << "\t";
-             // fout << "relay data" << hex << '\t' << dat_relay << '\t';
-              //fout << "flex @ addr: " << index_flex << '\t';
-              //fout << "flex data" << hex << '\t' << dat_flex << endl;
             }
         }
         if (err == 0) {
             fout << "correct!" << endl;
         } else {
             fout << "error!" << endl;
+            fout << "group index: " << group_index << '\t' << "g_offset_flex: " << hex << entry_g_offset_flex << endl;
             fout << "relay @ addr: " << entry_addr_relay << " ";
             fout << "data: ";
             for (int k = 0; k < 16; k++) {
