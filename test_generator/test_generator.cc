@@ -28,6 +28,7 @@ int main() {
   long long int addr_in_int;
   long long int addr_out_int;
 
+  long long int addr_base = stoi("0x33000000", nullptr, 16);
   long long int addr_min = stoi("0x33500000", nullptr, 16);
   long long int addr_max = stoi("0x33600000", nullptr, 16);
 
@@ -81,6 +82,12 @@ int main() {
     
     i = i+1;
   }
+  
+  long long int relay_matrix_y = addr_base + num_timesteps;
+  long long int relay_matrix_x = addr_base + num_vectors;
+
+  fout << hex << "t,1,2," << relay_matrix_y << "," << relay_matrix_x << ",2,1,2,1" << '\n';
+  fout << "2,0,3,0x0000dead,0x0" << endl;
   }
   
 
