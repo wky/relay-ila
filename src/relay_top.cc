@@ -51,8 +51,21 @@ Ila GetRelayIla(const std::string& model_name) {
   m.SetValid(is_func_call & is_valid_func);
 
   // define Relay instructions
+
+  DefineVectorAdd(m);
+  DefineVectorMultiply(m);
+  DefineVectorSigmoid(m);
+  DefineVectorTanh(m);
+
+  DefineNNDense(m);
+
+  DefineLSTM(m);
+  
+  
   DefineTensorStore(m);
   DefineMaxpooling2D(m);
+
+
   
   return m;
 }

@@ -56,14 +56,14 @@ int main() {
   // simulation generation
   IlaSim simulator_generator;
   std::string sim_gen_dir = "./sim_model/";
-  std::string systemc_path = "/u/yl29/local";
+  std::string systemc_path = "/opt/systemc";
   bool cpp_gen = false;
   // ILA_INFO << "test";
   simulator_generator.set_instr_lvl_abs(model);
   simulator_generator.set_systemc_path(systemc_path);
   // ILA_INFO << "before debug";
   //simulator_generator.sim_gen_decode_d();
-  simulator_generator.enable_cmake_support();
+  //simulator_generator.enable_cmake_support();
   simulator_generator.sim_gen(sim_gen_dir, false, true, cpp_gen);
 
   return 0;

@@ -52,6 +52,17 @@ void DefineInternalState(Ila& m);
 void DefineTensorStore(Ila& m);
 void DefineMaxpooling2D(Ila& m);
 
+// define Relay operations
+
+void DefineVectorAdd(Ila& m);
+void DefineVectorMultiply(Ila& m);
+void DefineVectorSigmoid(Ila& m);
+void DefineVectorTanh(Ila& m);
+
+void DefineNNDense(Ila& m);
+
+// define LSTM instructions
+void DefineLSTM(Ila& m);
 
 };
 

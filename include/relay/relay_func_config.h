@@ -31,5 +31,9 @@
 #include <relay/relay_func_call.h>
 #include <relay/relay_maxpooling.h>
 
+#include <relay/relay_vector_op.h>
+#include <relay/relay_nn_dense.h>
+#include <relay/relay_lstm.h>
+
 
 #endif // RELAY_FUNC_CONFIG_H__

@@ -57,7 +57,9 @@ add_executable(${MyTarget}
   src/relay_func_input.cc
   src/relay_arch_states.cc
   src/relay_internal_states.cc
-
+  src/relay_lstm.cc
+  src/relay_nn_dense.cc
+  src/relay_vector_op.cc
   src/relay_tensor_store.cc
   src/relay_maxpooling_2d.cc
 
