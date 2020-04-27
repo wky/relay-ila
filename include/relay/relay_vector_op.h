@@ -20,7 +20,7 @@ namespace ilang
 
 #define RELAY_ITE_FLAG(expr) Ite((expr), BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW), BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW))
 
-
+#define RELAY_VECTOR_OP_CHILD "relay_vector_op_child_module"
 #define RELAY_VECTOR_OP_SIZE "relay_vector_op_size"
 #define RELAY_VECTOR_OP_SIZE_BW RELAY_VECTOR_SIZE_BW
 #define RELAY_VECTOR_OP_CNTR "relay_vector_op_cntr"

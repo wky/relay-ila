@@ -4,15 +4,16 @@ namespace ilang
 
 void DefineVectorAdd(Ila& m)
 {
-  auto instr = m.NewInstr(RELAY_VECTOR_ADD);
+  auto vector_child = m.child(RELAY_VECTOR_OP_CHILD);
+  auto instr = vector_child.NewInstr(RELAY_VECTOR_ADD);
 
   auto vector_add_enable = m.state(RELAY_VECTOR_ADD_ENABLE);
+  auto child_start = m.state(RELAY_VECTOR_ADD_START);
 
   instr.SetDecode((vector_add_enable == RELAY_FLAG_ON) 
-    & (m.state(RELAY_VECTOR_OP_SIZE) != BvConst(0, RELAY_VECTOR_OP_SIZE_BW)));
-
+    & (m.state(RELAY_VECTOR_OP_SIZE) != BvConst(0, RELAY_VECTOR_OP_SIZE_BW))
+    & (child_start == RELAY_FLAG_OFF));
   auto cntr = m.state(RELAY_VECTOR_OP_CNTR);
-  auto child_start = m.state(RELAY_VECTOR_ADD_START);
   
   auto memory = m.state(RELAY_MEMORY);
 
@@ -20,7 +21,7 @@ void DefineVectorAdd(Ila& m)
   instr.SetUpdate(cntr, BvConst(0, RELAY_VECTOR_OP_CNTR_BW));
 
   {
-    auto child = m.NewChild(RELAY_VECTOR_ADD_CHILD);
+    auto child = vector_child.NewChild(RELAY_VECTOR_ADD_CHILD);
     auto child_started = (child_start == RELAY_FLAG_ON); 
     child.SetValid(child_started);
     {
@@ -54,15 +55,17 @@ void DefineVectorAdd(Ila& m)
 
 void DefineVectorMultiply(Ila& m) 
 {
-  auto instr = m.NewInstr(RELAY_VECTOR_MULTIPLY);
+  auto vector_child = m.child(RELAY_VECTOR_OP_CHILD);
+  auto instr = vector_child.NewInstr(RELAY_VECTOR_MULTIPLY);
 
   auto vector_multiply_enable = m.state(RELAY_VECTOR_MULTIPLY_ENABLE);
+  auto child_start = m.state(RELAY_VECTOR_MULTIPLY_START);
 
   instr.SetDecode((vector_multiply_enable == RELAY_FLAG_ON) 
-    & (m.state(RELAY_VECTOR_OP_SIZE) != BvConst(0, RELAY_VECTOR_OP_SIZE_BW)));
+    & (m.state(RELAY_VECTOR_OP_SIZE) != BvConst(0, RELAY_VECTOR_OP_SIZE_BW))
+    & (child_start == RELAY_FLAG_OFF));
 
   auto cntr = m.state(RELAY_VECTOR_OP_CNTR);
-  auto child_start = m.state(RELAY_VECTOR_MULTIPLY_START);
   
   auto memory = m.state(RELAY_MEMORY);
 
@@ -70,7 +73,7 @@ void DefineVectorMultiply(Ila& m)
   instr.SetUpdate(cntr, BvConst(0, RELAY_VECTOR_OP_CNTR_BW));
 
   {
-    auto child = m.NewChild(RELAY_VECTOR_MULTIPLY_CHILD);
+    auto child = vector_child.NewChild(RELAY_VECTOR_MULTIPLY_CHILD);
     auto child_started = (child_start == RELAY_FLAG_ON); 
     child.SetValid(child_started);
     {
@@ -103,15 +106,17 @@ void DefineVectorMultiply(Ila& m)
 
 void DefineVectorSigmoid(Ila& m) 
 {
-  auto instr = m.NewInstr(RELAY_VECTOR_SIGMOID);
+  auto vector_child = m.child(RELAY_VECTOR_OP_CHILD);
+  auto instr = vector_child.NewInstr(RELAY_VECTOR_SIGMOID);
 
   auto vector_sigmoid_enable = m.state(RELAY_VECTOR_SIGMOID_ENABLE);
+  auto child_start = m.state(RELAY_VECTOR_SIGMOID_START);
 
   instr.SetDecode((vector_sigmoid_enable == RELAY_FLAG_ON) 
-    & (m.state(RELAY_VECTOR_OP_SIZE) != BvConst(0, RELAY_VECTOR_OP_SIZE_BW)));
+    & (m.state(RELAY_VECTOR_OP_SIZE) != BvConst(0, RELAY_VECTOR_OP_SIZE_BW))
+    & (child_start == RELAY_FLAG_OFF));
 
   auto cntr = m.state(RELAY_VECTOR_OP_CNTR);
-  auto child_start = m.state(RELAY_VECTOR_SIGMOID_START);
   
   auto memory = m.state(RELAY_MEMORY);
 
@@ -119,7 +124,7 @@ void DefineVectorSigmoid(Ila& m)
   instr.SetUpdate(cntr, BvConst(0, RELAY_VECTOR_OP_CNTR_BW));
 
   {
-    auto child = m.NewChild(RELAY_VECTOR_SIGMOID_CHILD);
+    auto child = vector_child.NewChild(RELAY_VECTOR_SIGMOID_CHILD);
     auto child_started = (child_start == RELAY_FLAG_ON); 
     child.SetValid(child_started);
     {
@@ -151,15 +156,17 @@ void DefineVectorSigmoid(Ila& m)
 
 void DefineVectorTanh(Ila& m) 
 {
-  auto instr = m.NewInstr(RELAY_VECTOR_TANH);
+  auto vector_child = m.child(RELAY_VECTOR_OP_CHILD);
+  auto instr = vector_child.NewInstr(RELAY_VECTOR_TANH);
 
   auto vector_tanh_enable = m.state(RELAY_VECTOR_TANH_ENABLE);
+  auto child_start = m.state(RELAY_VECTOR_TANH_START);
 
   instr.SetDecode((vector_tanh_enable == RELAY_FLAG_ON) 
-    & (m.state(RELAY_VECTOR_OP_SIZE) != BvConst(0, RELAY_VECTOR_OP_SIZE_BW)));
+    & (m.state(RELAY_VECTOR_OP_SIZE) != BvConst(0, RELAY_VECTOR_OP_SIZE_BW))
+    & (child_start == RELAY_FLAG_OFF));
 
   auto cntr = m.state(RELAY_VECTOR_OP_CNTR);
-  auto child_start = m.state(RELAY_VECTOR_TANH_START);
   
   auto memory = m.state(RELAY_MEMORY);
 
@@ -167,7 +174,7 @@ void DefineVectorTanh(Ila& m)
   instr.SetUpdate(cntr, BvConst(0, RELAY_VECTOR_OP_CNTR_BW));
 
   {
-    auto child = m.NewChild(RELAY_VECTOR_TANH_CHILD);
+    auto child = vector_child.NewChild(RELAY_VECTOR_TANH_CHILD);
     auto child_started = (child_start == RELAY_FLAG_ON); 
     child.SetValid(child_started);
     {

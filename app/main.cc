@@ -63,7 +63,7 @@ int main() {
   simulator_generator.set_systemc_path(systemc_path);
   // ILA_INFO << "before debug";
   //simulator_generator.sim_gen_decode_d();
-  //simulator_generator.enable_cmake_support();
+  simulator_generator.enable_cmake_support();
   simulator_generator.sim_gen(sim_gen_dir, false, true, cpp_gen);
 
   return 0;

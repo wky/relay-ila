@@ -7,6 +7,8 @@ namespace ilang
 #define RELAY_NN_SIZE_BW 32
 #define RELAY_NN_ADDR_BW 32
 
+#define RELAY_NN_CHILD "relay_nn_child_module"
+
 #define RELAY_NN_DENSE_ENABLE "relay_nn_dense_enable"
 #define RELAY_NN_DENSE_INSTR "relay_nn_dense_instr"
 #define RELAY_NN_DENSE_LOOP_INIT_INSTR "relay_nn_dense_loop_init_instr"
@@ -16,7 +18,7 @@ namespace ilang
 #define RELAY_NN_DENSE_STATE "relay_nn_dense_state"
 #define RELAY_NN_DENSE_STATE_BW 8
 
-#define RELAY_NN_DENSE_END_STATE 0
+#define RELAY_NN_DENSE_IDLE_STATE 0
 #define RELAY_NN_DENSE_LOOP_INIT_STATE 1
 #define RELAY_NN_DENSE_LOOP_WRITE_STATE 2
 #define RELAY_NN_DENSE_LOOP_FMA_STATE 3

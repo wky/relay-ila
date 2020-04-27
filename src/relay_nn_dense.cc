@@ -7,8 +7,9 @@ namespace ilang
 
 void DefineNNDense(Ila& m)
 {
+  auto nn_child = m.child(RELAY_NN_CHILD);
 
-  auto instr = m.NewInstr(RELAY_NN_DENSE_INSTR);
+  auto instr = nn_child.NewInstr(RELAY_NN_DENSE_INSTR);
 
   auto dense_enable = m.state(RELAY_NN_DENSE_ENABLE);
   auto input_size = m.state(RELAY_NN_INPUT_SIZE);
@@ -28,7 +29,8 @@ void DefineNNDense(Ila& m)
 
   instr.SetDecode((dense_enable == BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW))
     & (input_size != BvConst(0, RELAY_NN_SIZE_BW))
-    & (output_size != BvConst(0, RELAY_NN_SIZE_BW)));
+    & (output_size != BvConst(0, RELAY_NN_SIZE_BW))
+    & (state == BvConst(RELAY_NN_DENSE_IDLE_STATE, RELAY_NN_DENSE_STATE_BW)));
 
   auto loop_cntr = m.state(RELAY_NN_DENSE_LOOP_CNTR);
   auto loop_start = m.state(RELAY_NN_DENSE_LOOP_START);
@@ -38,7 +40,7 @@ void DefineNNDense(Ila& m)
   instr.SetUpdate(state, BvConst(RELAY_NN_DENSE_LOOP_INIT_STATE, RELAY_NN_DENSE_STATE_BW));
 
   {
-    auto loop_child = m.NewChild(RELAY_NN_DENSE_LOOP_CHILD);
+    auto loop_child = nn_child.NewChild(RELAY_NN_DENSE_LOOP_CHILD);
     loop_child.SetValid((dense_enable == BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW)) & (loop_start == BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW)));
 
     auto fma_cntr = loop_child.NewBvState(RELAY_NN_DENSE_LOOP_FMA_CNTR, RELAY_NN_SIZE_BW);
@@ -97,7 +99,7 @@ void DefineNNDense(Ila& m)
 
       auto next_state = Ite(loop_continue, 
         BvConst(RELAY_NN_DENSE_LOOP_INIT_STATE, RELAY_NN_DENSE_STATE_BW),
-        BvConst(RELAY_NN_DENSE_END_STATE, RELAY_NN_DENSE_STATE_BW));
+        BvConst(RELAY_NN_DENSE_IDLE_STATE, RELAY_NN_DENSE_STATE_BW));
 
       auto next_dense_enable = RELAY_ITE_FLAG(loop_continue);
       auto next_loop_start = RELAY_ITE_FLAG(loop_continue);

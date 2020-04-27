@@ -1,12 +1,12 @@
-#include <systemc>
 #include <iostream>
 #include <string>
 #include <fstream>
 
-#include "relay_sim.h"
+#include <systemc.h>
+#include <relay_sim.h>
 
 // source module of the testbench
-// creating signals for flex_sim model
+// creating signals for relay_sim model
 SC_MODULE(Source) {
   sc_in<bool> clk{"clk"};
   //sc_in<bool> rst;
@@ -27,11 +27,29 @@ SC_MODULE(Source) {
   sc_out< sc_biguint<8> > relay_sim_layout_in_in;
   sc_out< sc_biguint<8> > relay_sim_ceil_mode_in_in;
 
+
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_in_size_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_out_size_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_input_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_cell_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_next_cell_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_hidden_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_next_hidden_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_i2h_weight_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_h2h_weight_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_i2h_bias_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_h2h_bias_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_temp_vector0_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_temp_vector1_addr_in;
+  sc_out< sc_biguint<32> > relay_sim_relay_lstm_temp_vector2_addr_in;
+  
+  
+
 //  void source_input();
 
   SC_CTOR(Source) {
     SC_THREAD(source_input);
-    sensitive << clk.pos();
+    // sensitive << clk.pos();
   }
 
   void source_input() {
@@ -52,7 +70,24 @@ SC_MODULE(Source) {
     relay_sim_layout_in_in = 0;
     relay_sim_ceil_mode_in_in = 0;
 
-    wait(10, SC_NS);
+    // reset inpusts for lstm
+
+    relay_sim_relay_lstm_in_size_in= 0;
+    relay_sim_relay_lstm_out_size_in= 0;
+    relay_sim_relay_lstm_input_addr_in= 0;
+    relay_sim_relay_lstm_cell_addr_in= 0;
+    relay_sim_relay_lstm_next_cell_addr_in= 0;
+    relay_sim_relay_lstm_hidden_addr_in= 0;
+    relay_sim_relay_lstm_next_hidden_addr_in= 0;
+    relay_sim_relay_lstm_i2h_weight_addr_in= 0;
+    relay_sim_relay_lstm_h2h_weight_addr_in= 0;
+    relay_sim_relay_lstm_i2h_bias_addr_in= 0;
+    relay_sim_relay_lstm_h2h_bias_addr_in= 0;
+    relay_sim_relay_lstm_temp_vector0_addr_in= 0;
+    relay_sim_relay_lstm_temp_vector1_addr_in= 0;
+    relay_sim_relay_lstm_temp_vector2_addr_in= 0;
+
+    // wait(10, SC_NS);
 
     std::ifstream fin;
     std::string temp;
@@ -77,8 +112,16 @@ SC_MODULE(Source) {
 
     wait(10, SC_NS);
 
-    fin.open("/u/yl29/3LA/test_input_relay.csv", ios::in);
+    /** generating input for LSTM  **/
 
+    relay_sim_relay_func_run_in_in = 1;
+    relay_sim_relay_func_id_in = 3; // F_LSTM_ID in relay_func_call.h
+    relay_sim_relay_lstm_in_size_in = 8;
+    relay_sim_relay_lstm_out_size_in = 16;
+
+
+    // fin.open("/u/yl29/3LA/test_input_relay.csv", ios::in);
+    /*
     while(std::getline(fin, temp, ',')) {
       std::getline(fin, func_run, ',');
       std::getline(fin, func_id, ',');
@@ -161,9 +204,11 @@ SC_MODULE(Source) {
 
 
       wait(50, SC_NS);
-    }
+    }*/
 
-    // cout << "source created for testbench" << endl;
+    cout << "source created for testbench" << endl;
+
+    wait(50, SC_NS);
   }
 };
 
@@ -190,11 +235,29 @@ SC_MODULE(testbench) {
   sc_signal< sc_biguint<8> > relay_sim_layout_in_signal;
   sc_signal< sc_biguint<8> > relay_sim_ceil_mode_in_signal;
 
+
+  // lstm signals
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_in_size_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_out_size_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_input_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_cell_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_next_cell_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_hidden_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_next_hidden_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_i2h_weight_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_h2h_weight_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_i2h_bias_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_h2h_bias_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_temp_vector0_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_temp_vector1_addr_in_signal;
+  sc_signal< sc_biguint<32> > relay_sim_relay_lstm_temp_vector2_addr_in_signal;
+  
+
   testbench(sc_module_name name)
   : sc_module(name),
     clk("clk", 1, SC_NS),
     src("source"),
-    relay("flexnlp")
+    relay("RELAY_LSTM_TEST")
     {
     // binding the signals from the source
     src.clk(clk);
@@ -215,6 +278,23 @@ SC_MODULE(testbench) {
     src.relay_sim_layout_in_in(relay_sim_layout_in_signal);
     src.relay_sim_ceil_mode_in_in(relay_sim_ceil_mode_in_signal);
 
+    // bind lstm signals from Source
+
+    src.relay_sim_relay_lstm_in_size_in(relay_sim_relay_lstm_in_size_in_signal);
+    src.relay_sim_relay_lstm_out_size_in(relay_sim_relay_lstm_out_size_in_signal);
+    src.relay_sim_relay_lstm_input_addr_in(relay_sim_relay_lstm_input_addr_in_signal);
+    src.relay_sim_relay_lstm_cell_addr_in(relay_sim_relay_lstm_cell_addr_in_signal);
+    src.relay_sim_relay_lstm_next_cell_addr_in(relay_sim_relay_lstm_next_cell_addr_in_signal);
+    src.relay_sim_relay_lstm_hidden_addr_in(relay_sim_relay_lstm_hidden_addr_in_signal);
+    src.relay_sim_relay_lstm_next_hidden_addr_in(relay_sim_relay_lstm_next_hidden_addr_in_signal);
+    src.relay_sim_relay_lstm_i2h_weight_addr_in(relay_sim_relay_lstm_i2h_weight_addr_in_signal);
+    src.relay_sim_relay_lstm_h2h_weight_addr_in(relay_sim_relay_lstm_h2h_weight_addr_in_signal);
+    src.relay_sim_relay_lstm_i2h_bias_addr_in(relay_sim_relay_lstm_i2h_bias_addr_in_signal);
+    src.relay_sim_relay_lstm_h2h_bias_addr_in(relay_sim_relay_lstm_h2h_bias_addr_in_signal);
+    src.relay_sim_relay_lstm_temp_vector0_addr_in(relay_sim_relay_lstm_temp_vector0_addr_in_signal);
+    src.relay_sim_relay_lstm_temp_vector1_addr_in(relay_sim_relay_lstm_temp_vector1_addr_in_signal);
+    src.relay_sim_relay_lstm_temp_vector2_addr_in(relay_sim_relay_lstm_temp_vector2_addr_in_signal);
+
 
     // binding the signals for the model
     relay.relay_sim_relay_func_run_in_in(relay_sim_relay_func_run_in_signal);
@@ -233,6 +313,23 @@ SC_MODULE(testbench) {
     relay.relay_sim_layout_in_in(relay_sim_layout_in_signal);
     relay.relay_sim_ceil_mode_in_in(relay_sim_ceil_mode_in_signal);
 
+
+    // bind lstm signals to relay_sim
+    relay.relay_sim_relay_lstm_in_size_in(relay_sim_relay_lstm_in_size_in_signal);
+    relay.relay_sim_relay_lstm_out_size_in(relay_sim_relay_lstm_out_size_in_signal);
+    relay.relay_sim_relay_lstm_input_addr_in(relay_sim_relay_lstm_input_addr_in_signal);
+    relay.relay_sim_relay_lstm_cell_addr_in(relay_sim_relay_lstm_cell_addr_in_signal);
+    relay.relay_sim_relay_lstm_next_cell_addr_in(relay_sim_relay_lstm_next_cell_addr_in_signal);
+    relay.relay_sim_relay_lstm_hidden_addr_in(relay_sim_relay_lstm_hidden_addr_in_signal);
+    relay.relay_sim_relay_lstm_next_hidden_addr_in(relay_sim_relay_lstm_next_hidden_addr_in_signal);
+    relay.relay_sim_relay_lstm_i2h_weight_addr_in(relay_sim_relay_lstm_i2h_weight_addr_in_signal);
+    relay.relay_sim_relay_lstm_h2h_weight_addr_in(relay_sim_relay_lstm_h2h_weight_addr_in_signal);
+    relay.relay_sim_relay_lstm_i2h_bias_addr_in(relay_sim_relay_lstm_i2h_bias_addr_in_signal);
+    relay.relay_sim_relay_lstm_h2h_bias_addr_in(relay_sim_relay_lstm_h2h_bias_addr_in_signal);
+    relay.relay_sim_relay_lstm_temp_vector0_addr_in(relay_sim_relay_lstm_temp_vector0_addr_in_signal);
+    relay.relay_sim_relay_lstm_temp_vector1_addr_in(relay_sim_relay_lstm_temp_vector1_addr_in_signal);
+    relay.relay_sim_relay_lstm_temp_vector2_addr_in(relay_sim_relay_lstm_temp_vector2_addr_in_signal);    
+
     SC_THREAD(run);
   }
 
@@ -242,24 +339,30 @@ SC_MODULE(testbench) {
 
     std::ofstream fout;
     fout.open("./test_output_relay.txt", ofstream::out | ofstream::trunc);
+
+    // relay.instr_log.open("./instr.log", ofstream::out | ofstream::trunc);
     
+    relay.instr_log.basic_ios<char>::rdbuf(std::cout.rdbuf());
     wait(10, SC_NS);
     std::cout << "@" << sc_time_stamp() << " ********* simulation start *********" << std::endl;
 
-    while(!done) {
-      if (relay.relay_sim_relay_func_id.to_int() == 3) {
-        done = true;
+
+    wait(100, SC_NS);
+    // while(!done) {
+      if (relay.relay_sim_relay_lstm_state.to_int() == 11) {
+        done = true; // end state: 11 in relay_lstm.h
       }
 
       //cout << "@" << sc_time_stamp() << '\t';
       //cout << "is write: " << (relay.relay_sim_relay_func_id.to_int() == 2) << '\t';
-    }
+    // }
       
 
     if (done) {
+      // relay.instr_log.flush();
       wait(100, SC_NS);
       fout << "********* output for tensor memory ***********" << endl;
-      
+      /*
       int entry_addr;
       int index;
       int tensor_out_y = relay.relay_sim_maxpooling_data_out_height.to_int() / 16;
@@ -276,7 +379,7 @@ SC_MODULE(testbench) {
               fout << hex << relay.decode_relay_sim_func_tensor_store_update_relay_sim_relay_tensor_mem_map[index] << ' ';
           }
           fout << endl;
-      }
+      }*/
 
       wait(1000, SC_NS);
       sc_stop();

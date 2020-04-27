@@ -52,11 +52,15 @@ Ila GetRelayIla(const std::string& model_name) {
 
   // define Relay instructions
 
+  auto vector_child = m.NewChild(RELAY_VECTOR_OP_CHILD);
+  vector_child.SetValid(is_func_call & is_valid_func);
   DefineVectorAdd(m);
   DefineVectorMultiply(m);
   DefineVectorSigmoid(m);
   DefineVectorTanh(m);
 
+  auto nn_child = m.NewChild(RELAY_NN_CHILD);
+  nn_child.SetValid(is_func_call & is_valid_func);
   DefineNNDense(m);
 
   DefineLSTM(m);

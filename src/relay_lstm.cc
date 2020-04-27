@@ -91,6 +91,7 @@ void DefineLSTM(Ila& m)
     auto dense_input_addr = m.state(RELAY_NN_INPUT_ADDR);
     auto dense_output_addr = m.state(RELAY_NN_OUTPUT_ADDR);
 
+    auto dense_state = m.state(RELAY_NN_DENSE_STATE);
     auto return_state = m.state(RELAY_LSTM_RETURN_STATE);
     
     {
@@ -102,6 +103,7 @@ void DefineLSTM(Ila& m)
       i2h_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       
       i2h_instr.SetUpdate(dense_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      i2h_instr.SetUpdate(dense_state, BvConst(RELAY_NN_DENSE_IDLE_STATE, RELAY_NN_DENSE_STATE_BW));
       i2h_instr.SetUpdate(dense_input_size, layer_in_size * 4);
       i2h_instr.SetUpdate(dense_input_wrap_around, layer_in_size);
       i2h_instr.SetUpdate(dense_output_size, layer_out_size);
@@ -120,8 +122,11 @@ void DefineLSTM(Ila& m)
 
       h2h_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       
-      h2h_instr.SetUpdate(dense_input_size, layer_out_size * 4);
-      h2h_instr.SetUpdate(dense_input_wrap_around, layer_out_size);
+      h2h_instr.SetUpdate(dense_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      h2h_instr.SetUpdate(dense_state, BvConst(RELAY_NN_DENSE_IDLE_STATE, RELAY_NN_DENSE_STATE_BW));
+
+      h2h_instr.SetUpdate(dense_input_size, layer_in_size * 4);
+      h2h_instr.SetUpdate(dense_input_wrap_around, layer_in_size);
       h2h_instr.SetUpdate(dense_output_size, layer_out_size);
 
       h2h_instr.SetUpdate(dense_weight_addr, h2h_weight_addr);
@@ -137,6 +142,7 @@ void DefineLSTM(Ila& m)
     auto vadd_op0_addr = m.state(RELAY_VECTOR_ADD_OP0_ADDR);
     auto vadd_op1_addr = m.state(RELAY_VECTOR_ADD_OP1_ADDR);
     auto vadd_output_addr = m.state(RELAY_VECTOR_ADD_OUTPUT_ADDR);
+    auto vadd_start = m.state(RELAY_VECTOR_ADD_START);
 
     {
       // setup vector-add of temp0 and temp1
@@ -146,6 +152,7 @@ void DefineLSTM(Ila& m)
 
       add_dense_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       add_dense_instr.SetUpdate(vadd_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      add_dense_instr.SetUpdate(vadd_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       add_dense_instr.SetUpdate(vadd_size, layer_out_size * 4);
       add_dense_instr.SetUpdate(vadd_op0_addr, temp_vector0_addr);
       add_dense_instr.SetUpdate(vadd_op1_addr, temp_vector1_addr);
@@ -157,7 +164,7 @@ void DefineLSTM(Ila& m)
     auto vsig_size = m.state(RELAY_VECTOR_OP_SIZE);
     auto vsig_op0_addr = m.state(RELAY_VECTOR_SIGMOID_OP0_ADDR);
     auto vsig_output_addr = m.state(RELAY_VECTOR_SIGMOID_OUTPUT_ADDR);
-
+    auto vsig_start = m.state(RELAY_VECTOR_SIGMOID_START);
     {
       // setup vector-sigmoid on temp2 (first 3 slices, forget/input/output gates)
       // output => temp0
@@ -167,6 +174,7 @@ void DefineLSTM(Ila& m)
 
       sigmoid_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       sigmoid_instr.SetUpdate(vsig_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      sigmoid_instr.SetUpdate(vsig_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       sigmoid_instr.SetUpdate(vsig_size, layer_out_size * 3);
       sigmoid_instr.SetUpdate(vsig_op0_addr, temp_vector2_addr);
       sigmoid_instr.SetUpdate(vsig_output_addr, temp_vector0_addr);
@@ -177,7 +185,7 @@ void DefineLSTM(Ila& m)
     auto vtanh_size = m.state(RELAY_VECTOR_OP_SIZE);
     auto vtanh_op0_addr = m.state(RELAY_VECTOR_TANH_OP0_ADDR);
     auto vtanh_output_addr = m.state(RELAY_VECTOR_TANH_OUTPUT_ADDR);
-    
+    auto vtanh_start = m.state(RELAY_VECTOR_TANH_START);
     {
       // setup vector-tanh on temp2 (4th slice, "cell input activation")
       // output => temp0 (4th slice)
@@ -188,6 +196,7 @@ void DefineLSTM(Ila& m)
       auto addr_offset = layer_out_size * (RELAY_VECTOR_DATA_BYTES * 3);
       cell_tanh_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       cell_tanh_instr.SetUpdate(vtanh_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      cell_tanh_instr.SetUpdate(vtanh_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       cell_tanh_instr.SetUpdate(vtanh_size, layer_out_size);
       cell_tanh_instr.SetUpdate(vtanh_op0_addr, temp_vector2_addr + addr_offset);
       cell_tanh_instr.SetUpdate(vtanh_output_addr, temp_vector0_addr + addr_offset);
@@ -199,7 +208,7 @@ void DefineLSTM(Ila& m)
     auto vmul_op0_addr = m.state(RELAY_VECTOR_MULTIPLY_OP0_ADDR);
     auto vmul_op1_addr = m.state(RELAY_VECTOR_MULTIPLY_OP1_ADDR);
     auto vmul_output_addr = m.state(RELAY_VECTOR_MULTIPLY_OUTPUT_ADDR);
-
+    auto vmul_start = m.state(RELAY_VECTOR_MULTIPLY_START);
     {
       // setup vector-multiply between forget gate (1st slice in temp 0) and cell state
       // save into temp 1 (1st slice)
@@ -211,6 +220,7 @@ void DefineLSTM(Ila& m)
       forget_gate_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       
       forget_gate_instr.SetUpdate(vmul_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      forget_gate_instr.SetUpdate(vmul_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       forget_gate_instr.SetUpdate(vmul_size, layer_out_size);
       forget_gate_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr);
       forget_gate_instr.SetUpdate(vmul_op1_addr, cell_addr);
@@ -231,6 +241,7 @@ void DefineLSTM(Ila& m)
       input_gate_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       
       input_gate_instr.SetUpdate(vmul_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      input_gate_instr.SetUpdate(vmul_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       input_gate_instr.SetUpdate(vmul_size, layer_out_size);
       input_gate_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr + addr_offset);
       input_gate_instr.SetUpdate(vmul_op1_addr, temp_vector0_addr + addr_offset * 3);
@@ -248,6 +259,7 @@ void DefineLSTM(Ila& m)
 
       next_cell_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       next_cell_instr.SetUpdate(vadd_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      next_cell_instr.SetUpdate(vadd_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       next_cell_instr.SetUpdate(vadd_size, layer_out_size);
       next_cell_instr.SetUpdate(vadd_op0_addr, temp_vector1_addr);
       next_cell_instr.SetUpdate(vadd_op1_addr, temp_vector1_addr + layer_out_size * RELAY_VECTOR_DATA_BYTES);
@@ -264,6 +276,7 @@ void DefineLSTM(Ila& m)
 
       next_cell_tanh_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       next_cell_tanh_instr.SetUpdate(vtanh_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      next_cell_tanh_instr.SetUpdate(vtanh_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       next_cell_tanh_instr.SetUpdate(vtanh_size, layer_out_size);
       next_cell_tanh_instr.SetUpdate(vtanh_op0_addr, next_cell_addr);
       next_cell_tanh_instr.SetUpdate(vtanh_output_addr, temp_vector1_addr + layer_out_size * (RELAY_VECTOR_DATA_BYTES * 2));
@@ -281,6 +294,7 @@ void DefineLSTM(Ila& m)
       output_gate_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       
       output_gate_instr.SetUpdate(vmul_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      output_gate_instr.SetUpdate(vmul_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       output_gate_instr.SetUpdate(vmul_size, layer_out_size);
       output_gate_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr + addr_offset);
       output_gate_instr.SetUpdate(vmul_op1_addr, temp_vector1_addr + addr_offset);
