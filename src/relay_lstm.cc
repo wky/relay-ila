@@ -45,11 +45,11 @@ void DefineLSTM(Ila& m)
   auto layer_out_size = m.input(RELAY_LSTM_OUT_SIZE);
 
   auto input_addr = m.input(RELAY_LSTM_INPUT_ADDR);
-  auto cell_addr = m.input(RELAY_LSTM_CELL_ADDR); // output from prev layer
-  auto next_cell_addr = m.input(RELAY_LSTM_NEXT_CELL_ADDR); // output to next layer
+  auto cell_addr = m.input(RELAY_LSTM_CELL_ADDR); // cell input from prev timestep
+  auto next_cell_addr = m.input(RELAY_LSTM_NEXT_CELL_ADDR); // cell output to next timestep
 
-  auto hidden_addr = m.input(RELAY_LSTM_HIDDEN_ADDR); // hidden state from prev
-  auto next_hidden_addr = m.input(RELAY_LSTM_NEXT_HIDDEN_ADDR); // hidden state to next
+  auto hidden_addr = m.input(RELAY_LSTM_HIDDEN_ADDR); // hidden state from prev timestep
+  auto next_hidden_addr = m.input(RELAY_LSTM_NEXT_HIDDEN_ADDR); // hidden state to next timestep
 
   auto i2h_weight_addr =  m.input(RELAY_LSTM_I2H_WEIGHT_ADDR); // input to hidden weights
   auto h2h_weight_addr =  m.input(RELAY_LSTM_H2H_WEIGHT_ADDR); // hidden to hidden weights
@@ -104,9 +104,9 @@ void DefineLSTM(Ila& m)
       
       i2h_instr.SetUpdate(dense_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
       i2h_instr.SetUpdate(dense_state, BvConst(RELAY_NN_DENSE_IDLE_STATE, RELAY_NN_DENSE_STATE_BW));
-      i2h_instr.SetUpdate(dense_input_size, layer_in_size * 4);
-      i2h_instr.SetUpdate(dense_input_wrap_around, layer_in_size);
-      i2h_instr.SetUpdate(dense_output_size, layer_out_size);
+      i2h_instr.SetUpdate(dense_input_size, layer_in_size);
+      i2h_instr.SetUpdate(dense_input_wrap_around, BvConst(0, RELAY_VECTOR_SIZE_BW));
+      i2h_instr.SetUpdate(dense_output_size, layer_out_size * 4);
 
       i2h_instr.SetUpdate(dense_weight_addr, i2h_weight_addr);
       i2h_instr.SetUpdate(dense_bias_addr, i2h_bias_addr);
@@ -125,9 +125,9 @@ void DefineLSTM(Ila& m)
       h2h_instr.SetUpdate(dense_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
       h2h_instr.SetUpdate(dense_state, BvConst(RELAY_NN_DENSE_IDLE_STATE, RELAY_NN_DENSE_STATE_BW));
 
-      h2h_instr.SetUpdate(dense_input_size, layer_in_size * 4);
-      h2h_instr.SetUpdate(dense_input_wrap_around, layer_in_size);
-      h2h_instr.SetUpdate(dense_output_size, layer_out_size);
+      h2h_instr.SetUpdate(dense_input_size, layer_out_size);
+      h2h_instr.SetUpdate(dense_input_wrap_around, BvConst(0, RELAY_VECTOR_SIZE_BW));
+      h2h_instr.SetUpdate(dense_output_size, layer_out_size * 4);
 
       h2h_instr.SetUpdate(dense_weight_addr, h2h_weight_addr);
       h2h_instr.SetUpdate(dense_bias_addr, h2h_bias_addr);

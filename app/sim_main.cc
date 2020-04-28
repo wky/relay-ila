@@ -5,6 +5,10 @@
 #include <systemc.h>
 #include <relay_sim.h>
 
+
+int in_sz, out_sz;
+
+
 // source module of the testbench
 // creating signals for relay_sim model
 SC_MODULE(Source) {
@@ -116,8 +120,8 @@ SC_MODULE(Source) {
 
     relay_sim_relay_func_run_in_in = 1;
     relay_sim_relay_func_id_in = 3; // F_LSTM_ID in relay_func_call.h
-    relay_sim_relay_lstm_in_size_in = 8;
-    relay_sim_relay_lstm_out_size_in = 16;
+    relay_sim_relay_lstm_in_size_in = in_sz;
+    relay_sim_relay_lstm_out_size_in = out_sz;
 
 
     // fin.open("/u/yl29/3LA/test_input_relay.csv", ios::in);
@@ -390,6 +394,12 @@ SC_MODULE(testbench) {
 
 int sc_main(int argc, char *argv[]) {
   cout << "test started" << endl;
+  cout<<"input size:";
+  cin>>in_sz;
+
+  cout<<"output size:";
+  cin>>out_sz;
+
   testbench tb("tb");
   sc_start();
   return 0;
