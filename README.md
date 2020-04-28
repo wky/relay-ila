@@ -31,3 +31,43 @@ The ILA model of TVM/Relay.
     cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=11 ..
     make
     ./relay_sim
+    
+# Input/Output sizes
+
+for input size of I and output size of O
+
+`input` `cell` shoud be vectors of size `I`
+`next_cell` `hidden` `next_hidden` shoud be vectors of size `O`
+
+`12h_weight` should be matrix of size `O*4 x I`
+`i2h_bias` should be vector of size `O*4`
+
+`h2h_weight` should be matrix of size `O*4 x O`
+`h2h_bias` should be vector of size `O*4`
+
+`temp_vector0` `temp_vector1` `temp_vector2` should be vectors of size `I*4`
+
+# instruction sequence
+
+- i2h
+    - `O*4` groups of `relay_nn_dense_loop_fma_instr`, `I` per group (`I*O*4` total)
+- h2h
+    - `O*4` groups of `relay_nn_dense_loop_fma_instr`, `O` per group (`O*O*4` total)
+- add dense results
+    - `O*4` number of `relay_vector_add_child_instr`
+- sigmoid 
+    - `O*3` number of `relay_vector_sigmoid_child_instr`
+- cell tanh
+    - `O` number of `relay_vector_tanh_child_instr`
+- forget gate
+    - `O` number of `relay_vector_multiply_child_instr`
+- input gate
+    - `O` number of `relay_vector_multiply_child_instr`
+- next cell
+    - `O` number of `relay_vector_add_child_instr`
+- next cell tanh
+    - `O` number of `relay_vector_tanh_child_instr`
+- output gate
+    - `O` number of `relay_vector_multiply_child_instr`
+
+
