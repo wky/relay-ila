@@ -72,7 +72,7 @@ void DefineNNDense(Ila& m)
           
           auto load_input_addr = input_addr +  input_index * RELAY_VECTOR_DATA_BYTES;
           
-          auto next_acc = bv_add(acc, bv_multiply(Load(memory, load_weight_addr), Load(memory, load_input_addr)));
+          auto next_acc = bv_add(acc, bv_multiply(RELAY_LOAD_WORD(memory, load_weight_addr), RELAY_LOAD_WORD(memory, load_input_addr)));
 
           auto next_fma_cntr = fma_cntr + BvConst(1, RELAY_NN_SIZE_BW);
           auto fma_continue = (next_fma_cntr != input_size);
@@ -95,7 +95,7 @@ void DefineNNDense(Ila& m)
       auto next_loop_cntr = loop_cntr + BvConst(1, RELAY_NN_SIZE_BW);
       auto loop_continue = (next_loop_cntr != output_size);
       auto addr_offset = loop_cntr * RELAY_VECTOR_DATA_BYTES;
-      auto result = bv_add(acc, Load(memory, bias_addr + addr_offset));
+      auto result = bv_add(acc, RELAY_LOAD_WORD(memory, bias_addr + addr_offset));
 
       auto next_state = Ite(loop_continue, 
         BvConst(RELAY_NN_DENSE_LOOP_INIT_STATE, RELAY_NN_DENSE_STATE_BW),
@@ -112,7 +112,7 @@ void DefineNNDense(Ila& m)
       write_instr.SetUpdate(loop_start, next_loop_start);
       write_instr.SetUpdate(lstm_state, next_lstm_state);
       write_instr.SetUpdate(loop_cntr, next_loop_cntr);
-      write_instr.SetUpdate(memory, Store(memory, output_addr + addr_offset, result));
+      write_instr.SetUpdate(memory, RELAY_STORE_WORD(memory, output_addr + addr_offset, result));
     }
   }
 

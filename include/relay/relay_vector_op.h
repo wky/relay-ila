@@ -8,11 +8,15 @@ namespace ilang
 
 #define RELAY_VECTOR_DATA_BW 32
 #define RELAY_VECTOR_DATA_BYTES 4
-
+#define RELAY_WORD_ADDR_SHIFT 2
 #define RELAY_VECTOR_DATA_ZERO 0
 
 #define RELAY_VECTOR_ADDR_BW 32
 #define RELAY_VECTOR_SIZE_BW 32
+
+
+#define RELAY_LOAD_WORD(__memory, __byte_addr) Load(__memory, (__byte_addr) >> 2)
+#define RELAY_STORE_WORD(__memory, __byte_addr, __word_val) Store(__memory, (__byte_addr) >> 2, (__word_val))
 
 #define RELAY_FLAG_BW 1	
 #define RELAY_FLAG_ON 1

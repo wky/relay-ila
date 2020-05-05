@@ -166,7 +166,7 @@ void DefineLSTM(Ila& m)
     auto vsig_output_addr = m.state(RELAY_VECTOR_SIGMOID_OUTPUT_ADDR);
     auto vsig_start = m.state(RELAY_VECTOR_SIGMOID_START);
     {
-      // setup vector-sigmoid on temp2 (first 3 slices, forget/input/output gates)
+      // setup vector-sigmoid on temp2 (first 2 slices, input/forget/in-trans/output gates)
       // output => temp0
       auto sigmoid_instr = child.NewInstr(RELAY_LSTM_SIGMOID_INSTR);
       sigmoid_instr.SetDecode(child_started
@@ -175,7 +175,7 @@ void DefineLSTM(Ila& m)
       sigmoid_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       sigmoid_instr.SetUpdate(vsig_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
       sigmoid_instr.SetUpdate(vsig_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
-      sigmoid_instr.SetUpdate(vsig_size, layer_out_size * 3);
+      sigmoid_instr.SetUpdate(vsig_size, layer_out_size * 2);
       sigmoid_instr.SetUpdate(vsig_op0_addr, temp_vector2_addr);
       sigmoid_instr.SetUpdate(vsig_output_addr, temp_vector0_addr);
       sigmoid_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_CELL_TANH_STATE, RELAY_LSTM_STATE_BW));
@@ -187,21 +187,40 @@ void DefineLSTM(Ila& m)
     auto vtanh_output_addr = m.state(RELAY_VECTOR_TANH_OUTPUT_ADDR);
     auto vtanh_start = m.state(RELAY_VECTOR_TANH_START);
     {
-      // setup vector-tanh on temp2 (4th slice, "cell input activation")
+      // setup vector-tanh on temp2 (3rd slice, "cell input activation")
       // output => temp0 (4th slice)
       auto cell_tanh_instr = child.NewInstr(RELAY_LSTM_CELL_TANH_INSTR);
       cell_tanh_instr.SetDecode(child_started
         & (state == BvConst(RELAY_LSTM_CELL_TANH_STATE, RELAY_LSTM_STATE_BW)));
 
-      auto addr_offset = layer_out_size * (RELAY_VECTOR_DATA_BYTES * 3);
+      auto addr_offset = layer_out_size * (RELAY_VECTOR_DATA_BYTES * 2);
       cell_tanh_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       cell_tanh_instr.SetUpdate(vtanh_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
       cell_tanh_instr.SetUpdate(vtanh_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       cell_tanh_instr.SetUpdate(vtanh_size, layer_out_size);
       cell_tanh_instr.SetUpdate(vtanh_op0_addr, temp_vector2_addr + addr_offset);
       cell_tanh_instr.SetUpdate(vtanh_output_addr, temp_vector0_addr + addr_offset);
-      cell_tanh_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_FORGET_GATE_STATE, RELAY_LSTM_STATE_BW)); 
+      cell_tanh_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_OUTPUT_GATE_STATE, RELAY_LSTM_STATE_BW)); 
     }
+
+    {
+      // setup vector-sigmoid on temp2 (last slices, output )
+      // output => temp0
+      auto output_gate_instr = child.NewInstr(RELAY_LSTM_OUTPUT_GATE_INSTR);
+      output_gate_instr.SetDecode(child_started
+        & (state == BvConst(RELAY_LSTM_OUTPUT_GATE_STATE, RELAY_LSTM_STATE_BW)));
+
+      auto addr_offset = layer_out_size * (RELAY_VECTOR_DATA_BYTES * 3);
+      output_gate_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
+      output_gate_instr.SetUpdate(vsig_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      output_gate_instr.SetUpdate(vsig_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
+      output_gate_instr.SetUpdate(vsig_size, layer_out_size);
+      output_gate_instr.SetUpdate(vsig_op0_addr, temp_vector2_addr + addr_offset);
+      output_gate_instr.SetUpdate(vsig_output_addr, temp_vector0_addr + addr_offset);
+      output_gate_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_FORGET_GATE_STATE, RELAY_LSTM_STATE_BW));
+    }
+
+
 
     auto vmul_enable = m.state(RELAY_VECTOR_MULTIPLY_ENABLE);
     auto vmul_size = m.state(RELAY_VECTOR_OP_SIZE);
@@ -210,7 +229,7 @@ void DefineLSTM(Ila& m)
     auto vmul_output_addr = m.state(RELAY_VECTOR_MULTIPLY_OUTPUT_ADDR);
     auto vmul_start = m.state(RELAY_VECTOR_MULTIPLY_START);
     {
-      // setup vector-multiply between forget gate (1st slice in temp 0) and cell state
+      // setup vector-multiply between forget gate (2nd slice in temp 0) and cell state
       // save into temp 1 (1st slice)
 
       auto forget_gate_instr = child.NewInstr(RELAY_LSTM_FORGET_GATE_INSTR);
@@ -222,7 +241,7 @@ void DefineLSTM(Ila& m)
       forget_gate_instr.SetUpdate(vmul_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
       forget_gate_instr.SetUpdate(vmul_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       forget_gate_instr.SetUpdate(vmul_size, layer_out_size);
-      forget_gate_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr);
+      forget_gate_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr + (layer_out_size * RELAY_VECTOR_DATA_BYTES));
       forget_gate_instr.SetUpdate(vmul_op1_addr, cell_addr);
       forget_gate_instr.SetUpdate(vmul_output_addr, temp_vector1_addr);
       forget_gate_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_INPUT_GATE_STATE, RELAY_LSTM_STATE_BW));
@@ -243,9 +262,9 @@ void DefineLSTM(Ila& m)
       input_gate_instr.SetUpdate(vmul_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
       input_gate_instr.SetUpdate(vmul_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
       input_gate_instr.SetUpdate(vmul_size, layer_out_size);
-      input_gate_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr + addr_offset);
-      input_gate_instr.SetUpdate(vmul_op1_addr, temp_vector0_addr + addr_offset * 3);
-      input_gate_instr.SetUpdate(vmul_output_addr, temp_vector1_addr + addr_offset);
+      input_gate_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr);
+      input_gate_instr.SetUpdate(vmul_op1_addr, temp_vector0_addr + (layer_out_size * RELAY_VECTOR_DATA_BYTES * 2));
+      input_gate_instr.SetUpdate(vmul_output_addr, temp_vector1_addr + (layer_out_size * RELAY_VECTOR_DATA_BYTES));
       input_gate_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_NEXT_CELL_STATE, RELAY_LSTM_STATE_BW));
 
     }
@@ -280,26 +299,25 @@ void DefineLSTM(Ila& m)
       next_cell_tanh_instr.SetUpdate(vtanh_size, layer_out_size);
       next_cell_tanh_instr.SetUpdate(vtanh_op0_addr, next_cell_addr);
       next_cell_tanh_instr.SetUpdate(vtanh_output_addr, temp_vector1_addr + layer_out_size * (RELAY_VECTOR_DATA_BYTES * 2));
-      next_cell_tanh_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_OUTPUT_GATE_STATE, RELAY_LSTM_STATE_BW)); 
+      next_cell_tanh_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_OUTPUT_STATE, RELAY_LSTM_STATE_BW)); 
     }
 
     {
       // setup vector-mul between output gate (3rd slice of temp0) and tanh of next cell state (3rd slice of temp1)
       // output => next_hidden_addr
-      auto output_gate_instr = child.NewInstr(RELAY_LSTM_OUTPUT_GATE_INSTR);
-      output_gate_instr.SetDecode(child_started 
-        & (state == BvConst(RELAY_LSTM_OUTPUT_GATE_STATE, RELAY_LSTM_STATE_BW)));
+      auto output_instr = child.NewInstr(RELAY_LSTM_OUTPUT_INSTR);
+      output_instr.SetDecode(child_started 
+        & (state == BvConst(RELAY_LSTM_OUTPUT_STATE, RELAY_LSTM_STATE_BW)));
 
-      auto addr_offset = layer_out_size * (RELAY_VECTOR_DATA_BYTES * 2);
-      output_gate_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
+      output_instr.SetUpdate(state, BvConst(RELAY_WAIT_STATE, RELAY_LSTM_STATE_BW));
       
-      output_gate_instr.SetUpdate(vmul_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
-      output_gate_instr.SetUpdate(vmul_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
-      output_gate_instr.SetUpdate(vmul_size, layer_out_size);
-      output_gate_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr + addr_offset);
-      output_gate_instr.SetUpdate(vmul_op1_addr, temp_vector1_addr + addr_offset);
-      output_gate_instr.SetUpdate(vmul_output_addr, next_hidden_addr);
-      output_gate_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_END_STATE, RELAY_LSTM_STATE_BW));
+      output_instr.SetUpdate(vmul_enable, BvConst(RELAY_FLAG_ON, RELAY_FLAG_BW));
+      output_instr.SetUpdate(vmul_start, BvConst(RELAY_FLAG_OFF, RELAY_FLAG_BW));
+      output_instr.SetUpdate(vmul_size, layer_out_size);
+      output_instr.SetUpdate(vmul_op0_addr, temp_vector0_addr + layer_out_size * (RELAY_VECTOR_DATA_BYTES * 3));
+      output_instr.SetUpdate(vmul_op1_addr, temp_vector1_addr + layer_out_size * (RELAY_VECTOR_DATA_BYTES * 2));
+      output_instr.SetUpdate(vmul_output_addr, next_hidden_addr);
+      output_instr.SetUpdate(return_state, BvConst(RELAY_LSTM_END_STATE, RELAY_LSTM_STATE_BW));
 
     }
   }

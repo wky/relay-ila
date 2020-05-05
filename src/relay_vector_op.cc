@@ -33,7 +33,7 @@ void DefineVectorAdd(Ila& m)
       auto op1_addr = m.state(RELAY_VECTOR_ADD_OP1_ADDR) + addr_offset;
       auto output_addr = m.state(RELAY_VECTOR_ADD_OUTPUT_ADDR) + addr_offset;
       // uninterpreted add function
-      auto result = bv_add(Load(memory, op0_addr), Load(memory, op1_addr));
+      auto result = bv_add(RELAY_LOAD_WORD(memory, op0_addr), RELAY_LOAD_WORD(memory, op1_addr));
       
       auto next_cntr = cntr + BvConst(1, RELAY_VECTOR_OP_CNTR_BW);
       auto continue_cond = (next_cntr != m.state(RELAY_VECTOR_OP_SIZE));
@@ -43,7 +43,7 @@ void DefineVectorAdd(Ila& m)
       auto next_lstm_state = Ite(continue_cond, lstm_state, m.state(RELAY_LSTM_RETURN_STATE));
 
 
-      child_instr.SetUpdate(memory, Store(memory, output_addr, result));
+      child_instr.SetUpdate(memory, RELAY_STORE_WORD(memory, output_addr, result));
       child_instr.SetUpdate(cntr, next_cntr);
       child_instr.SetUpdate(child_start, next_child_start);
       child_instr.SetUpdate(vector_add_enable, next_vector_add_enable);
@@ -85,7 +85,7 @@ void DefineVectorMultiply(Ila& m)
       auto op1_addr = m.state(RELAY_VECTOR_MULTIPLY_OP1_ADDR) + addr_offset;
       auto output_addr = m.state(RELAY_VECTOR_MULTIPLY_OUTPUT_ADDR) + addr_offset;
       // uninterpreted add function
-      auto result = bv_multiply(Load(memory, op0_addr), Load(memory, op1_addr));
+      auto result = bv_multiply(RELAY_LOAD_WORD(memory, op0_addr), RELAY_LOAD_WORD(memory, op1_addr));
       
       auto next_cntr = cntr + BvConst(1, RELAY_VECTOR_OP_CNTR_BW);
       auto continue_cond = (next_cntr != m.state(RELAY_VECTOR_OP_SIZE));
@@ -95,7 +95,7 @@ void DefineVectorMultiply(Ila& m)
       auto next_lstm_state = Ite(continue_cond, lstm_state, m.state(RELAY_LSTM_RETURN_STATE));
 
 
-      child_instr.SetUpdate(memory, Store(memory, output_addr, result));
+      child_instr.SetUpdate(memory, RELAY_STORE_WORD(memory, output_addr, result));
       child_instr.SetUpdate(cntr, next_cntr);
       child_instr.SetUpdate(child_start, next_child_start);
       child_instr.SetUpdate(vector_multiply_enable, next_vector_multiply_enable);
@@ -135,7 +135,7 @@ void DefineVectorSigmoid(Ila& m)
       auto op0_addr = m.state(RELAY_VECTOR_SIGMOID_OP0_ADDR) + addr_offset;
       auto output_addr = m.state(RELAY_VECTOR_SIGMOID_OUTPUT_ADDR) + addr_offset;
       // uninterpreted sigmoid function
-      auto result = bv_sigmoid(Load(memory, op0_addr));
+      auto result = bv_sigmoid(RELAY_LOAD_WORD(memory, op0_addr));
       
       auto next_cntr = cntr + 1;
       auto continue_cond = (next_cntr != m.state(RELAY_VECTOR_OP_SIZE));
@@ -145,7 +145,7 @@ void DefineVectorSigmoid(Ila& m)
       auto lstm_state = m.state(RELAY_LSTM_STATE);
       auto next_lstm_state = Ite(continue_cond, lstm_state, m.state(RELAY_LSTM_RETURN_STATE));
 
-      child_instr.SetUpdate(memory, Store(memory, output_addr, result));
+      child_instr.SetUpdate(memory, RELAY_STORE_WORD(memory, output_addr, result));
       child_instr.SetUpdate(cntr, next_cntr);
       child_instr.SetUpdate(child_start, next_child_start);
       child_instr.SetUpdate(vector_sigmoid_enable, next_vector_sigmoid_enable);
@@ -185,7 +185,7 @@ void DefineVectorTanh(Ila& m)
       auto op0_addr = m.state(RELAY_VECTOR_TANH_OP0_ADDR) + addr_offset;
       auto output_addr = m.state(RELAY_VECTOR_TANH_OUTPUT_ADDR) + addr_offset;
       // uninterpreted sigmoid function
-      auto result = bv_tanh(Load(memory, op0_addr));
+      auto result = bv_tanh(RELAY_LOAD_WORD(memory, op0_addr));
       
       auto next_cntr = cntr + 1;
       auto continue_cond = (next_cntr != m.state(RELAY_VECTOR_OP_SIZE));
@@ -195,7 +195,7 @@ void DefineVectorTanh(Ila& m)
       auto lstm_state = m.state(RELAY_LSTM_STATE);
       auto next_lstm_state = Ite(continue_cond, lstm_state, m.state(RELAY_LSTM_RETURN_STATE));
 
-      child_instr.SetUpdate(memory, Store(memory, output_addr, result));
+      child_instr.SetUpdate(memory, RELAY_STORE_WORD(memory, output_addr, result));
       child_instr.SetUpdate(cntr, next_cntr);
       child_instr.SetUpdate(child_start, next_child_start);
       child_instr.SetUpdate(vector_tanh_enable, next_vector_tanh_enable);

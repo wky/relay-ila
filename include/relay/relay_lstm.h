@@ -13,12 +13,13 @@ namespace ilang
 #define RELAY_LSTM_ADD_DENSE_STATE 3
 #define RELAY_LSTM_SIGMOID_STATE 4
 #define RELAY_LSTM_CELL_TANH_STATE 5
-#define RELAY_LSTM_FORGET_GATE_STATE 6
-#define RELAY_LSTM_INPUT_GATE_STATE 7
-#define RELAY_LSTM_NEXT_CELL_STATE 8
-#define RELAY_LSTM_NEXT_CELL_TANH_STATE 9
-#define RELAY_LSTM_OUTPUT_GATE_STATE 10
-#define RELAY_LSTM_END_STATE 11
+#define RELAY_LSTM_OUTPUT_GATE_STATE 6
+#define RELAY_LSTM_FORGET_GATE_STATE 7
+#define RELAY_LSTM_INPUT_GATE_STATE 8
+#define RELAY_LSTM_NEXT_CELL_STATE 9
+#define RELAY_LSTM_NEXT_CELL_TANH_STATE 10
+#define RELAY_LSTM_OUTPUT_STATE 11
+#define RELAY_LSTM_END_STATE 12
 
 #define RELAY_LSTM_MATRIX_VECTOR "relay_lstm_matrix_vector_module" 
 #define RELAY_LSTM_DENSE_I2H_INSTR "relay_lstm_dense_i2h_instr"
@@ -26,11 +27,12 @@ namespace ilang
 #define RELAY_LSTM_ADD_DENSE_INSTR "relay_lstm_add_dense_instr"
 #define RELAY_LSTM_SIGMOID_INSTR "relay_lstm_sigmoid_instr"
 #define RELAY_LSTM_CELL_TANH_INSTR "relay_lstm_cell_tanh_instr"
+#define RELAY_LSTM_OUTPUT_GATE_INSTR "relay_lstm_output_gate_instr"
 #define RELAY_LSTM_FORGET_GATE_INSTR "relay_lstm_forget_gate_instr"
 #define RELAY_LSTM_INPUT_GATE_INSTR "relay_lstm_input_gate_instr"
 #define RELAY_LSTM_NEXT_CELL_INSTR "relay_lstm_next_cell_instr"
 #define RELAY_LSTM_NEXT_CELL_TANH_INSTR "relay_lstm_next_cell_tanh_instr"
-#define RELAY_LSTM_OUTPUT_GATE_INSTR "relay_lstm_output_gate_instr"
+#define RELAY_LSTM_OUTPUT_INSTR "relay_lstm_output_instr"
 
 
 #define RELAY_LSTM_FLAG_BW 1

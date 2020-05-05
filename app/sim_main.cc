@@ -1,14 +1,36 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <iomanip>
 
 #include <systemc.h>
 #include <relay_sim.h>
 
 
+#define DATA_BW 32
+#define WORD_SIZE 4
+#define INC_ADDR_BY_WORDS(__base_addr, __words) do {__base_addr += __words * WORD_SIZE;} while(false)
+
+#define WORD_ADDR(__byte_addr) ((__byte_addr) / WORD_SIZE)
+
+
+#define READ_WORDS(__fstream, __num_words, __map, __word_cntr) do{ \
+            char __word_buf[WORD_SIZE]; \
+            std::cout<<"READING "<<__num_words<<" words....\n";\
+            for (int __idx = 0; __idx < (__num_words); __idx++) { \
+              (__fstream).read(__word_buf, WORD_SIZE); \
+              unsigned int __word_val = *(unsigned int*)__word_buf;\
+              float __fp_val = *(float*)__word_buf;\
+              std::cout<<"\tread "<<WORD_SIZE<<" bytes: 0x"<<hex<<__word_val<<dec<<" float: "<<std::setprecision(6)<<__fp_val<<"\n";\
+              (__map)[(__word_cntr)] = __word_val; \
+              (__word_cntr) ++; \
+            }} while(false)
+
+
+
 int in_sz, out_sz;
-
-
+unsigned int next_cell_addr, next_hidden_addr;
+std::ifstream file;
 // source module of the testbench
 // creating signals for relay_sim model
 SC_MODULE(Source) {
@@ -91,124 +113,54 @@ SC_MODULE(Source) {
     relay_sim_relay_lstm_temp_vector1_addr_in= 0;
     relay_sim_relay_lstm_temp_vector2_addr_in= 0;
 
-    // wait(10, SC_NS);
-
-    std::ifstream fin;
-    std::string temp;
-    std::string hex_hdr = "0x";
-
-    std::string addr_x, addr_y;
-    std::string addr_x_format, addr_y_format;
-    std::string data_format;
-
-    // relay input temp
-    std::string func_run, func_id;
-    std::string data_in;
-
-    std::string data_in_y, data_in_x;
-    std::string pool_y, pool_x;
-    std::string stride_y, stride_x;
-    
-    const char *addr_x_c, *addr_y_c;
-    const char *data_byte_c;
-
-    sc_biguint<32> relay_sim_data_in_x_base;
-
     wait(10, SC_NS);
 
     /** generating input for LSTM  **/
 
     relay_sim_relay_func_run_in_in = 1;
     relay_sim_relay_func_id_in = 3; // F_LSTM_ID in relay_func_call.h
-    relay_sim_relay_lstm_in_size_in = in_sz;
-    relay_sim_relay_lstm_out_size_in = out_sz;
 
-
-    // fin.open("/u/yl29/3LA/test_input_relay.csv", ios::in);
-    /*
-    while(std::getline(fin, temp, ',')) {
-      std::getline(fin, func_run, ',');
-      std::getline(fin, func_id, ',');
-
-      if (func_id.compare("1") == 0) { // function maxpooling
-        // std::getline(fin, data_in, ',');
-        std::getline(fin, data_in_y, ',');
-        std::getline(fin, data_in_x, ',');
-        std::getline(fin, pool_y, ',');
-        std::getline(fin, pool_x, ',');
-        std::getline(fin, stride_y, ',');
-        std::getline(fin, stride_x, '\n');
-
-
-      } else { // function tensor store
-        std::getline(fin, data_in_x, ',');
-        std::getline(fin, data_in_y, '\n');
-      }
-
-      relay_sim_relay_func_run_in_in = func_run.c_str();
-      relay_sim_relay_func_id_in = func_id.c_str();
-
-      // tensor store
-      if (func_id.compare("2") == 0) {
-        //TODO: adapt the correct format of addr
-        // extract the address
-        addr_x = data_in_x.substr(data_in_x.length() - 5, 5);
-        addr_x_format = "0x00" + addr_x;
-        addr_x_c = addr_x_format.c_str();
-        relay_sim_data_in_x_base = addr_x_c;
-
-        // extract the data
-        data_format.clear();
-        if (data_in_y.length() <= 34) {
-          data_format.append(34 - data_in_y.length(), '0');
-          data_format.append(data_in_y.substr(2));
-        } else {
-          data_format.append(data_in_y.substr(data_in_y.length()-32));
-        }
-        // TODO: modify here
-        std::string data_byte;
-        for (int i = 0; i<16; i++) {
-          data_byte = data_format.substr(30-2*i, 2);
-          data_byte_c = ("0x" + data_byte).c_str();
-
-          relay_sim_relay_data_in_in = data_byte_c;
-          relay_sim_data_in_x_in = relay_sim_data_in_x_base + i;
-
-          std::cout << "@" << sc_time_stamp() << '\t';
-          std::cout << "addr: " << hex << relay_sim_data_in_x_in << '\t';
-          std::cout << "data: " << hex << relay_sim_relay_data_in_in << std::endl;
-
-          wait(1, SC_NS);
-        }
-      }
-
-      // maxpooling
-      if (func_id.compare("1") == 0) {
+    relay_sim_relay_lstm_in_size_in= in_sz;
+    relay_sim_relay_lstm_out_size_in= out_sz;
     
-        // extract the address
-        addr_x = data_in_x.substr(data_in_x.length() - 5, 5);
-        addr_x_format = "0x00" + addr_x;
-        addr_x_c = addr_x_format.c_str();
+    unsigned int base_addr = 0x00000000;
+    relay_sim_relay_lstm_input_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, in_sz);
 
-        addr_y = data_in_y.substr(data_in_y.length() - 5, 5);
-        addr_y_format = "0x00" + addr_y;
-        addr_y_c = addr_y_format.c_str();
+    relay_sim_relay_lstm_cell_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, out_sz);
 
-        // pass the data to the port
-        relay_sim_relay_data_in_in = 0;
-        relay_sim_data_in_y_in = addr_y_c;
-        relay_sim_data_in_x_in = addr_x_c;
-        relay_sim_pool_size_y_in = pool_y.c_str();
-        relay_sim_pool_size_x_in = pool_x.c_str();
-        relay_sim_strides_y_in_in = stride_y.c_str();
-        relay_sim_strides_x_in_in = stride_x.c_str();
+    relay_sim_relay_lstm_hidden_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, out_sz);
 
-        std::cout << "@" << sc_time_stamp() << '\t' << "relay maxpooling instr passed!" << std::endl;
-      }
+    relay_sim_relay_lstm_i2h_weight_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, 4 * out_sz * in_sz);
 
+    relay_sim_relay_lstm_h2h_weight_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, 4 * out_sz * out_sz);
 
-      wait(50, SC_NS);
-    }*/
+    relay_sim_relay_lstm_i2h_bias_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, 4 * out_sz);
+
+    relay_sim_relay_lstm_h2h_bias_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, 4 * out_sz);
+    
+    relay_sim_relay_lstm_temp_vector0_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, 4 * out_sz);
+
+    relay_sim_relay_lstm_temp_vector1_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, 4 * out_sz);
+
+    relay_sim_relay_lstm_temp_vector2_addr_in = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, 4 * out_sz);
+
+    relay_sim_relay_lstm_next_cell_addr_in = base_addr;
+    next_cell_addr = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, out_sz);
+
+    relay_sim_relay_lstm_next_hidden_addr_in = base_addr;
+    next_hidden_addr = base_addr;
+    INC_ADDR_BY_WORDS(base_addr, out_sz);
 
     cout << "source created for testbench" << endl;
 
@@ -342,19 +294,30 @@ SC_MODULE(testbench) {
     bool done = false;
 
     std::ofstream fout;
-    fout.open("./test_output_relay.txt", ofstream::out | ofstream::trunc);
-
-    // relay.instr_log.open("./instr.log", ofstream::out | ofstream::trunc);
+    // fout.open("relay_data_out.txt", ofstream::out | ofstream::trunc);
+    fout.basic_ios<char>::rdbuf(std::cout.rdbuf());
+    // relay.instr_log.open("relay_instr.log", ofstream::out | ofstream::trunc);
     
     relay.instr_log.basic_ios<char>::rdbuf(std::cout.rdbuf());
     wait(10, SC_NS);
     std::cout << "@" << sc_time_stamp() << " ********* simulation start *********" << std::endl;
 
+    int word_cntr = 0;
+    // order: input, cell, hidden, i2h_weight, h2h_weight, i2h_bias, h2h_bias
+    READ_WORDS(file, in_sz, relay.relay_sim_relay_memory, word_cntr);
+    READ_WORDS(file, out_sz, relay.relay_sim_relay_memory, word_cntr);
+    READ_WORDS(file, out_sz, relay.relay_sim_relay_memory, word_cntr);
+    READ_WORDS(file, 4 * out_sz * in_sz, relay.relay_sim_relay_memory, word_cntr);
+    READ_WORDS(file, 4 * out_sz * out_sz, relay.relay_sim_relay_memory, word_cntr);
+    READ_WORDS(file, 4 * out_sz, relay.relay_sim_relay_memory, word_cntr);
+    READ_WORDS(file, 4 * out_sz, relay.relay_sim_relay_memory, word_cntr);
+
+    std::cout<<"word cntr is at : "<<dec<<word_cntr<<"\n";
 
     wait(100, SC_NS);
     // while(!done) {
-      if (relay.relay_sim_relay_lstm_state.to_int() == 11) {
-        done = true; // end state: 11 in relay_lstm.h
+      if (relay.relay_sim_relay_lstm_state.to_int() == 12) {
+        done = true; // end state: 12 in relay_lstm.h
       }
 
       //cout << "@" << sc_time_stamp() << '\t';
@@ -366,6 +329,32 @@ SC_MODULE(testbench) {
       // relay.instr_log.flush();
       wait(100, SC_NS);
       fout << "********* output for tensor memory ***********" << endl;
+      fout <<"<><><><><>next_cell_state:\n";
+      for (int i = 0; i < out_sz; i++){
+        unsigned int hex_value = relay.relay_sim_relay_memory[WORD_ADDR(next_cell_addr)+i].to_uint();
+        float float_value = *(float*)&hex_value;
+        fout<<"\t0x"<<hex<<hex_value<<dec<<"\t float: "<<std::setprecision(6)<<float_value<<"\n";
+      }
+
+      int *output_val = new int[out_sz];
+      int *benchmark = new int[out_sz];
+      file.read((char*)benchmark, out_sz * WORD_SIZE);
+
+      double rel_err_acc = 0;
+      fout <<"<><><><><>next_hidden_state:\n";
+      for (int i = 0; i < out_sz; i++){
+        output_val[i] = relay.relay_sim_relay_memory[WORD_ADDR(next_hidden_addr) + i].to_uint();
+        float float_value = ((float*)output_val)[i];
+        fout<<"???? 0x"<<hex<<std::setw(8)<<std::setfill('0')<<output_val[i]<<dec<<"\t"<<std::setprecision(6)<<float_value<<"\n";
+        float benchmark_value = ((float*)benchmark)[i];
+        fout<<"++++ 0x"<<hex<<std::setw(8)<<std::setfill('0')<<benchmark[i]<<dec<<"\t"<<std::setprecision(6)<<benchmark_value<<"\n\n";
+        if (benchmark_value != 0.0)
+          rel_err_acc += abs(((double)float_value - (double)benchmark_value)/(double)benchmark_value);
+      }
+      fout<<"Average relative error: "<< rel_err_acc*100.0/out_sz<<"\n";
+
+      delete[] output_val;
+      delete[] benchmark;
       /*
       int entry_addr;
       int index;
@@ -392,13 +381,18 @@ SC_MODULE(testbench) {
   }
 };
 
-int sc_main(int argc, char *argv[]) {
-  cout << "test started" << endl;
-  cout<<"input size:";
-  cin>>in_sz;
 
-  cout<<"output size:";
-  cin>>out_sz;
+
+int sc_main(int argc, char *argv[]) {
+  std::cout << "test started" << endl;
+  
+  char buf[4];
+  file = ifstream("lstm.bin", std::ifstream::binary);
+  file.read(buf, 4);
+  in_sz = *(int*)buf;
+  file.read(buf, 4);
+  out_sz = *(int*)buf;
+  std::cout<<"input size: "<<in_sz<<"\noutput size: "<<out_sz<<"\n";
 
   testbench tb("tb");
   sc_start();
