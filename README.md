@@ -34,6 +34,10 @@ The ILA model of TVM/Relay.
     make
     # optional
     # ../../../script/lstm_test.py 64 lstm.bin
+    cp ../../../flex-sim/* .
+    mv flex-64x64-step1.bin lstm.bin
+    ./relay_sim
+    mv flex-64x64-step2.bin lstm.bin
     ./relay_sim
     
 # Input/Output sizes

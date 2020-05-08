@@ -13,16 +13,16 @@
 
 #define WORD_ADDR(__byte_addr) ((__byte_addr) / WORD_SIZE)
 
-
+#define PRINT_BIN false
 #define READ_WORDS(__fstream, __num_words, __map, __word_cntr) do{ \
             char __word_buf[WORD_SIZE]; \
-            std::cout<<"READING "<<__num_words<<" words....\n";\
+            if (PRINT_BIN) std::cout<<"READING "<<__num_words<<" words....\n";\
             for (int __idx = 0; __idx < (__num_words); __idx++) { \
               (__fstream).read(__word_buf, WORD_SIZE); \
               unsigned int __word_val = *(unsigned int*)__word_buf;\
               float __fp_val = *(float*)__word_buf;\
-              std::cout<<"\tread "<<WORD_SIZE<<" bytes: 0x"<<hex<<__word_val<<dec<<" float: "<<std::setprecision(6)<<__fp_val<<"\n";\
-              (__map)[(__word_cntr)] = __word_val; \
+              if (PRINT_BIN) {std::cout<<"\tread "<<WORD_SIZE<<" bytes: 0x"<<hex<<__word_val<<dec<<" float: "<<std::setprecision(6)<<__fp_val<<"\n";\
+              } (__map)[(__word_cntr)] = __word_val; \
               (__word_cntr) ++; \
             }} while(false)
 
@@ -294,11 +294,11 @@ SC_MODULE(testbench) {
     bool done = false;
 
     std::ofstream fout;
-    // fout.open("relay_data_out.txt", ofstream::out | ofstream::trunc);
-    fout.basic_ios<char>::rdbuf(std::cout.rdbuf());
-    // relay.instr_log.open("relay_instr.log", ofstream::out | ofstream::trunc);
+    fout.open("relay_data_out.txt", ofstream::out | ofstream::trunc);
+    // fout.basic_ios<char>::rdbuf(std::cout.rdbuf());
+    relay.instr_log.open("relay_instr.log", ofstream::out | ofstream::trunc);
     
-    relay.instr_log.basic_ios<char>::rdbuf(std::cout.rdbuf());
+    // relay.instr_log.basic_ios<char>::rdbuf(std::cout.rdbuf());
     wait(10, SC_NS);
     std::cout << "@" << sc_time_stamp() << " ********* simulation start *********" << std::endl;
 
@@ -330,10 +330,12 @@ SC_MODULE(testbench) {
       wait(100, SC_NS);
       fout << "********* output for tensor memory ***********" << endl;
       fout <<"<><><><><>next_cell_state:\n";
+      std::ofstream obin("relay_out.bin");
       for (int i = 0; i < out_sz; i++){
         unsigned int hex_value = relay.relay_sim_relay_memory[WORD_ADDR(next_cell_addr)+i].to_uint();
         float float_value = *(float*)&hex_value;
         fout<<"\t0x"<<hex<<hex_value<<dec<<"\t float: "<<std::setprecision(6)<<float_value<<"\n";
+        obin.write((char*)&hex_value ,4);
       }
 
       int *output_val = new int[out_sz];
@@ -352,7 +354,18 @@ SC_MODULE(testbench) {
           rel_err_acc += abs(((double)float_value - (double)benchmark_value)/(double)benchmark_value);
       }
       fout<<"Average relative error: "<< rel_err_acc*100.0/out_sz<<"\n";
+      fout<<"====== compact float32 output (F[15]...F[0] each row):\n";
 
+      for (int i = 0; i < 4; i++) {
+        for (int j = 15; j >=0; j--){
+            float fval = ((float*)output_val)[i*16+j];
+            fout<<std::setprecision(6)<<fval<<" ";
+        }
+        fout<<"\n";
+      }
+      fout.close();
+      obin.write((char*)output_val, 4 * out_sz);
+      obin.close();
       delete[] output_val;
       delete[] benchmark;
       /*
